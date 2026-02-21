@@ -28,7 +28,8 @@ This implementation plan outlines a step-by-step, verifiable process for buildin
 - **Real-Time Sync**: Wire the `onDragEnd` event to trigger our Convex mutation, instantly updating the post's scheduled date in the database.
 
 ### Phase 4: Post Creation & Preview System
-- **Draft Staging**: Implement a UI modal/drawer for creating and editing posts.
+- **Create Post Page**: Implement a dedicated `/create` page for creating new posts (sidebar remains visible).
+- **Side-by-Side Layout**: The left side will contain the post creation form, while the right side will display the live preview.
 - **Platform Previews**: Build visual replica cards that show what the post will look like on target platforms (e.g., a Twitter tweet format, a LinkedIn post format) as the user types.
 
 ### Phase 5: Analytics & Multi-Account Support

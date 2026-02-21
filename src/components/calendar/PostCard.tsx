@@ -50,7 +50,7 @@ export function PostCard({
       {...attributes}
       {...listeners}
       className={cn(
-        "group flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm transition-all hover:-translate-y-[1px] hover:border-slate-300 hover:shadow-md",
+        "group flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:shadow-md",
         transform ? "z-50 opacity-90 cursor-grabbing" : "cursor-grab",
       )}
     >
@@ -61,7 +61,7 @@ export function PostCard({
             platformStyles[platform],
           )}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+          <span className="h-1.5 w-1.5 rounded-full bg-current " />
           {platform}
         </span>
 

@@ -14,6 +14,7 @@ export default defineSchema({
       v.literal("scheduled"),
       v.literal("published"),
     ),
+    imageUrl: v.optional(v.string()),
     scheduledDate: v.optional(v.number()), // Unix timestamp
     authorId: v.string(), // We will mock this for now
   }).index("by_status", ["status"]),

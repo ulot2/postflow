@@ -143,7 +143,6 @@ export function Calendar() {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex h-full flex-col">
-        {/* ── Header ── */}
         <div className="flex items-center justify-between px-1 pb-4">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             {format(currentDate, "MMMM yyyy")}
@@ -262,11 +261,11 @@ export function Calendar() {
         </div>
 
         {/* ── Tip bar ── */}
-        <div className="mt-3 rounded-xl bg-blue-50/70 px-4 py-3 text-sm text-slate-600">
+        {/* <div className="mt-3 rounded-xl bg-blue-50/70 px-4 py-3 text-sm text-slate-600">
           <span className="mr-1.5">💡</span>
           <span className="font-semibold text-amber-600">Tip:</span> Drag and
           drop posts to reschedule them to different dates!
-        </div>
+        </div> */}
       </div>
     </DndContext>
   );

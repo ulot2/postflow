@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 
 export function Sidebar() {
   return (
@@ -33,6 +34,14 @@ export function Sidebar() {
             />
           </svg>
           Calendar
+        </Link>
+        <Link
+          href="/posts"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+        >
+          {/* Pen Icon */}
+          <FileText />
+          Posts
         </Link>
         <Link
           href="/analytics"

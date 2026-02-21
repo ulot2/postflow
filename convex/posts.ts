@@ -39,13 +39,22 @@ export const createPost = mutation({
       v.literal("instagram"),
     ),
     authorId: v.string(),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("published"),
+    ),
+    imageUrl: v.optional(v.string()),
+    scheduledDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("posts", {
       content: args.content,
       platform: args.platform,
-      status: "draft",
+      status: args.status,
       authorId: args.authorId,
+      imageUrl: args.imageUrl,
+      scheduledDate: args.scheduledDate,
     });
   },
 });
@@ -60,5 +69,12 @@ export const updateSchedule = mutation({
       scheduledDate: args.scheduledDate,
       status: "scheduled",
     });
+  },
+});
+
+export const deletePost = mutation({
+  args: { id: v.id("posts") },
+  handler: async (ctx, args) => {
+    return await ctx.db.delete(args.id);
   },
 });
