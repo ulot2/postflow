@@ -11,6 +11,13 @@ export const getPosts = query({
   },
 });
 
+export const getPost = query({
+  args: { id: v.id("posts") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 /** Posts with scheduledDate in [startTs, endTs] for the calendar week view. */
 export const getPostsInRange = query({
   args: {
@@ -53,6 +60,28 @@ export const createPost = mutation({
       platform: args.platform,
       status: args.status,
       authorId: args.authorId,
+      imageUrl: args.imageUrl,
+      scheduledDate: args.scheduledDate,
+    });
+  },
+});
+
+export const updatePost = mutation({
+  args: {
+    id: v.id("posts"),
+    content: v.string(),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("published"),
+    ),
+    imageUrl: v.optional(v.string()),
+    scheduledDate: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args.id, {
+      content: args.content,
+      status: args.status,
       imageUrl: args.imageUrl,
       scheduledDate: args.scheduledDate,
     });

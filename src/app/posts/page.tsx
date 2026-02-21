@@ -213,13 +213,20 @@ export default function PostsPage() {
 
               {/* Buttons */}
               <div className="flex justify-between items-center gap-2 pt-4 border-t border-slate-100">
-                <Button
-                  variant="outline"
-                  className="flex-1 h-10 text-slate-700 font-medium border-slate-200"
+                <Link
+                  href={`/edit/${post._id}`}
+                  passHref
+                  className="flex-1"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 text-slate-700 font-medium border-slate-200"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-slate-200"

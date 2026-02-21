@@ -14,6 +14,7 @@ interface PostFormProps {
   data: PostFormData;
   onChange: (data: PostFormData) => void;
   onSubmit: (status: "draft" | "scheduled") => void;
+  isEditing?: boolean;
 }
 
 const AVAILABLE_PLATFORMS = [
@@ -35,8 +36,14 @@ const AVAILABLE_PLATFORMS = [
   },
 ];
 
-export function PostForm({ data, onChange, onSubmit }: PostFormProps) {
+export function PostForm({
+  data,
+  onChange,
+  onSubmit,
+  isEditing,
+}: PostFormProps) {
   const togglePlatform = (id: string) => {
+    if (isEditing) return; // Prevent changing platform
     const newPlatforms = data.platforms.includes(id)
       ? data.platforms.filter((p) => p !== id)
       : [...data.platforms, id];
@@ -52,19 +59,27 @@ export function PostForm({ data, onChange, onSubmit }: PostFormProps) {
             Target Platforms
           </label>
           <div className="flex flex-wrap gap-2">
-            {AVAILABLE_PLATFORMS.map((platform) => (
-              <button
-                key={platform.id}
-                onClick={() => togglePlatform(platform.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  data.platforms.includes(platform.id)
-                    ? platform.color + " shadow-md scale-105"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                {platform.label}
-              </button>
-            ))}
+            {AVAILABLE_PLATFORMS.map((platform) => {
+              if (isEditing && !data.platforms.includes(platform.id))
+                return null;
+
+              return (
+                <button
+                  key={platform.id}
+                  onClick={() => togglePlatform(platform.id)}
+                  disabled={isEditing}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    data.platforms.includes(platform.id)
+                      ? platform.color +
+                        " shadow-md" +
+                        (!isEditing ? " scale-105" : "")
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  } ${isEditing ? "opacity-80 cursor-default" : ""}`}
+                >
+                  {platform.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

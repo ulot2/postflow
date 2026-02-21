@@ -1,10 +1,36 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, Calendar, BarChart3, LayoutDashboard } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Sidebar() {
+  const pathname = usePathname();
+
+  const navItems = [
+    {
+      name: "Calendar",
+      href: "/",
+      icon: Calendar,
+      isActive: pathname === "/",
+    },
+    {
+      name: "Posts",
+      href: "/posts",
+      icon: FileText,
+      isActive: pathname === "/posts" || pathname.startsWith("/edit/"),
+    },
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      isActive: pathname === "/dashboard",
+    },
+  ];
+
   return (
-    <aside className="w-64 h-screen border-r border-slate-200 glass-panel flex flex-col pt-6 pb-4">
+    <aside className="w-64 h-screen border-r border-slate-200 glass-panel flex flex-col pt-6 pb-4 shrink-0">
       <div className="px-6 mb-10">
         <h1 className="text-xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
           PostFlow
@@ -15,54 +41,23 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 space-y-2">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-100 text-slate-900 font-medium transition-colors"
-        >
-          {/* Calendar Icon Placeholder */}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          Calendar
-        </Link>
-        <Link
-          href="/posts"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-        >
-          {/* Pen Icon */}
-          <FileText />
-          Posts
-        </Link>
-        <Link
-          href="/analytics"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-        >
-          {/* Chart Icon Placeholder */}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-          Analytics
-        </Link>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
+                item.isActive
+                  ? "bg-slate-100 text-slate-900"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              {item.name}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="px-6 mt-auto">

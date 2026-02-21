@@ -10,8 +10,12 @@ import {
   LinkedInPreview,
   InstagramPreview,
 } from "./PlatformPreviews";
-import { Calendar, Info } from "lucide-react";
+import { Calendar, Info, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import { format } from "date-fns";
+import Link from "next/link";
 import { Id } from "../../../convex/_generated/dataModel";
 
 interface Post {
@@ -36,6 +40,16 @@ export function PostPreviewModal({
   isOpen,
   onClose,
 }: PostPreviewModalProps) {
+  const deletePost = useMutation(api.posts.deletePost);
+
+  const handleDelete = async () => {
+    if (!post) return;
+    if (confirm("Are you sure you want to delete this post?")) {
+      await deletePost({ id: post._id });
+      onClose();
+    }
+  };
+
   if (!post) return null;
 
   return (
@@ -77,7 +91,7 @@ export function PostPreviewModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-slate-100 -mx-6 -mb-6 p-6 border-t border-slate-200 flex-1">
+        <div className="bg-slate-100 -mx-6 p-6 border-t border-slate-200 flex-1">
           {post.platform === "twitter" && (
             <TwitterPreview content={post.content} imageUrl={post.imageUrl} />
           )}
@@ -87,6 +101,25 @@ export function PostPreviewModal({
           {post.platform === "instagram" && (
             <InstagramPreview content={post.content} imageUrl={post.imageUrl} />
           )}
+        </div>
+
+        <div className="flex justify-between items-center gap-2 pt-4 mt-2 border-t border-slate-100">
+          <Link href={`/edit/${post._id}`} passHref className="flex-1">
+            <Button
+              variant="outline"
+              className="w-full h-10 text-slate-700 font-medium border-slate-200"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-slate-200"
+            onClick={handleDelete}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
