@@ -39,6 +39,7 @@ export default function CreatePostPage() {
             platform: platform as "twitter" | "linkedin" | "instagram",
             authorId: "user-1", // Match MOCK_AUTHOR_ID in Calendar
             status,
+            imageUrl: formData.imageUrl || undefined,
             scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
           }),
         ),

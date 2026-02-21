@@ -1,0 +1,94 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  TwitterPreview,
+  LinkedInPreview,
+  InstagramPreview,
+} from "./PlatformPreviews";
+import { Calendar, Info } from "lucide-react";
+import { format } from "date-fns";
+import { Id } from "../../../convex/_generated/dataModel";
+
+interface Post {
+  _id: Id<"posts">;
+  _creationTime: number;
+  scheduledDate?: number;
+  imageUrl?: string;
+  content: string;
+  platform: "twitter" | "linkedin" | "instagram";
+  authorId: string;
+  status: "draft" | "scheduled" | "published";
+}
+
+interface PostPreviewModalProps {
+  post: Post | null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function PostPreviewModal({
+  post,
+  isOpen,
+  onClose,
+}: PostPreviewModalProps) {
+  if (!post) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col pt-8">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="flex items-center gap-2">
+            Post Preview
+            {post.status === "scheduled" && (
+              <span className="bg-blue-100 text-blue-600 px-2.5 py-0.5 rounded-full text-xs font-medium lowercase">
+                scheduled
+              </span>
+            )}
+            {post.status === "draft" && (
+              <span className="bg-amber-100 text-amber-600 px-2.5 py-0.5 rounded-full text-xs font-medium lowercase">
+                draft
+              </span>
+            )}
+          </DialogTitle>
+          <DialogDescription className="flex flex-col gap-2 mt-2">
+            <span className="flex items-center gap-2 text-slate-600">
+              <Calendar className="w-4 h-4 shrink-0" />
+              <span>
+                {post.status === "draft" ? "Draft saved" : "Scheduled for "}
+                {post.scheduledDate
+                  ? format(
+                      new Date(post.scheduledDate),
+                      "MMM d, yyyy 'at' h:mm a",
+                    )
+                  : "No date set"}
+              </span>
+            </span>
+            <span className="flex items-center gap-2 text-slate-600">
+              <Info className="w-4 h-4 shrink-0" />
+              <span className="capitalize">
+                {post.platform} formatting applied
+              </span>
+            </span>
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="bg-slate-100 -mx-6 -mb-6 p-6 border-t border-slate-200 flex-1">
+          {post.platform === "twitter" && (
+            <TwitterPreview content={post.content} imageUrl={post.imageUrl} />
+          )}
+          {post.platform === "linkedin" && (
+            <LinkedInPreview content={post.content} imageUrl={post.imageUrl} />
+          )}
+          {post.platform === "instagram" && (
+            <InstagramPreview content={post.content} imageUrl={post.imageUrl} />
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

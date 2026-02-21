@@ -28,6 +28,7 @@ import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "./PostCard";
+import { PostPreviewModal } from "../shared/PostPreviewModal";
 
 const MOCK_AUTHOR_ID = "user-1";
 
@@ -59,6 +60,9 @@ function DroppableDayZone({
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
 
   const updateSchedule = useMutation(api.posts.updateSchedule);
 
@@ -248,6 +252,7 @@ export function Calendar() {
                                   : undefined
                               }
                               status={post.status}
+                              onClick={() => setSelectedPost(post)}
                             />
                           ))}
                         </div>
@@ -267,6 +272,12 @@ export function Calendar() {
           drop posts to reschedule them to different dates!
         </div> */}
       </div>
+
+      <PostPreviewModal
+        post={selectedPost}
+        isOpen={selectedPost !== null}
+        onClose={() => setSelectedPost(null)}
+      />
     </DndContext>
   );
 }

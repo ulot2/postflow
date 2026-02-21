@@ -10,6 +10,7 @@ import { Calendar, Trash2, Edit } from "lucide-react";
 import { FaXTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import { format } from "date-fns";
 import { Id } from "../../../convex/_generated/dataModel";
+import { PostPreviewModal } from "@/components/shared/PostPreviewModal";
 
 type FilterStatus = "all" | "draft" | "scheduled" | "published";
 
@@ -17,6 +18,9 @@ export default function PostsPage() {
   const posts = useQuery(api.posts.getPosts, { authorId: "user-1" });
   const deletePost = useMutation(api.posts.deletePost);
   const [filter, setFilter] = useState<FilterStatus>("all");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
 
   const counts: Record<string, number> = {
     all: posts?.length || 0,
@@ -106,7 +110,8 @@ export default function PostsPage() {
           {filteredPosts?.map((post) => (
             <div
               key={post._id}
-              className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col h-[260px] hover:shadow-md transition-shadow"
+              className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col h-[260px] hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setSelectedPost(post)}
             >
               {/* Card Header */}
               <div className="flex justify-between items-start mb-4">
@@ -218,7 +223,10 @@ export default function PostsPage() {
                 <Button
                   variant="outline"
                   className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-slate-200"
-                  onClick={() => handleDelete(post._id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(post._id);
+                  }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -233,6 +241,12 @@ export default function PostsPage() {
           )}
         </div>
       </main>
+
+      <PostPreviewModal
+        post={selectedPost}
+        isOpen={selectedPost !== null}
+        onClose={() => setSelectedPost(null)}
+      />
     </div>
   );
 }
