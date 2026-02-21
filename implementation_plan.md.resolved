@@ -1,0 +1,47 @@
+# Social Media Content Planner
+
+This implementation plan outlines a step-by-step, verifiable process for building our SaaS content planner. We are prioritizing a highly dynamic, premium user aesthetic with real-time connectivity via Convex.
+
+## User Review Required
+
+> [!IMPORTANT]
+> Please review this phased approach. As your Lead Engineer and Design Director, I will guide you through executing this plan one step at a time. Once you confirm you are happy with these phases, we will begin **Phase 1: Project Setup & Foundation**.
+
+> [!TIP]
+> From a design standpoint, we will utilize a cohesive, sleek UI. Think deep dark mode with neon accents, frosted glass (glassmorphism) panels for the calendar slots, modern typography (like Inter or Outfit), and fluid Framer-like micro-animations for drag-and-drop actions. 
+
+## Proposed Changes
+
+### Phase 1: Project Setup & Foundation
+- **Next.js & Tailwind**: Initialize the boilerplate using Next.js App Router and pnpm.
+- **Convex Boilerplate**: Set up the initial `convex` folder and install necessary packages.
+- **Design System setup**: Modify `globals.css` and `tailwind.config.ts` to include our custom color palettes, glassmorphism utilities, and animation keyframes.
+- **App Shell**: Create the primary layout consisting of a responsive sidebar and a main content area.
+
+### Phase 2: Database Schema & Backend Core
+- **Schema Definition**: Create `convex/schema.ts` defining structures for `posts` (state: draft/scheduled/published), `accounts`, and `analytics`.
+- **Backend API**: Write Convex functions (queries to fetch posts, mutations to add/edit/reschedule posts). We will test these using Convex's dashboard.
+
+### Phase 3: Interactive Calendar & Drag-and-Drop
+- **Calendar UI**: Develop a responsive, custom calendar grid leveraging modern CSS Grid.
+- **Drag-and-Drop Integration**: Utilize `@dnd-kit/core` to make posts draggable and calendar days droppable.
+- **Real-Time Sync**: Wire the `onDragEnd` event to trigger our Convex mutation, instantly updating the post's scheduled date in the database.
+
+### Phase 4: Post Creation & Preview System
+- **Draft Staging**: Implement a UI modal/drawer for creating and editing posts.
+- **Platform Previews**: Build visual replica cards that show what the post will look like on target platforms (e.g., a Twitter tweet format, a LinkedIn post format) as the user types.
+
+### Phase 5: Analytics & Multi-Account Support
+- **Analytics Mockup**: Create visually striking charts/KPI cards using mock data to represent post performance.
+- **Account Switcher**: Integrate an account selection dropdown in the navigation that filters visible posts.
+- **Final Polish**: Audit the UI for consistency, add subtle hover states, and ensure mobile responsiveness.
+
+## Verification Plan
+
+### Automated Tests
+- Run `npx tsc` to verify TypeScript integrity as we build.
+- Confirm Convex functions compile and deploy successfully.
+
+### Manual Verification
+- After each instruction, test the specific feature in the browser (e.g., visually confirm the drag-and-drop works).
+- Open the calendar in two side-by-side browser windows to verify Convex's real-time updates when a post is dragged to a new date.

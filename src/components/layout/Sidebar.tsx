@@ -1,13 +1,14 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function Sidebar() {
   return (
-    <aside className="w-64 h-screen border-r border-white/10 glass-panel flex flex-col pt-6 pb-4">
+    <aside className="w-64 h-screen border-r border-slate-200 glass-panel flex flex-col pt-6 pb-4">
       <div className="px-6 mb-10">
-        <h1 className="text-xl font-bold bg-linear-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
+        <h1 className="text-xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
           PostFlow
         </h1>
-        <p className="text-xs text-white/50 tracking-wider uppercase mt-1">
+        <p className="text-xs text-slate-500 tracking-wider uppercase mt-1">
           Planner
         </p>
       </div>
@@ -15,7 +16,7 @@ export function Sidebar() {
       <nav className="flex-1 px-4 space-y-2">
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-500/10 text-primary-500 font-medium transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-100 text-slate-900 font-medium transition-colors"
         >
           {/* Calendar Icon Placeholder */}
           <svg
@@ -35,7 +36,7 @@ export function Sidebar() {
         </Link>
         <Link
           href="/analytics"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
         >
           {/* Chart Icon Placeholder */}
           <svg
@@ -56,9 +57,9 @@ export function Sidebar() {
       </nav>
 
       <div className="px-6 mt-auto">
-        <button className="w-full py-2 bg-surface hover:bg-surface-hover border border-white/5 rounded-lg text-sm transition-colors text-white/80">
+        <Button variant="outline" className="w-full shadow-sm text-slate-700">
           Account Settings
-        </button>
+        </Button>
       </div>
     </aside>
   );
