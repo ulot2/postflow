@@ -30,8 +30,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { PostPreviewModal } from "../shared/PostPreviewModal";
 
-const MOCK_AUTHOR_ID = "user-1";
-
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
 function DroppableDayZone({
@@ -117,7 +115,6 @@ export function Calendar() {
   const endTs = useMemo(() => endOfDay(gridEnd).getTime(), [gridEnd]);
 
   const postsInRange = useQuery(api.posts.getPostsInRange, {
-    authorId: MOCK_AUTHOR_ID,
     startTs,
     endTs,
   });

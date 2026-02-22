@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { FileText, Calendar, BarChart3, LayoutDashboard } from "lucide-react";
+import { FileText, Calendar, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { UserButton, SignedIn } from "@clerk/nextjs";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -61,9 +61,11 @@ export function Sidebar() {
       </nav>
 
       <div className="px-6 mt-auto">
-        <Button variant="outline" className="w-full shadow-sm text-slate-700">
-          Account Settings
-        </Button>
+        <SignedIn>
+          <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white shadow-sm">
+            <UserButton afterSignOutUrl="/sign-in" showName />
+          </div>
+        </SignedIn>
       </div>
     </aside>
   );

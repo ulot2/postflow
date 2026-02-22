@@ -1,13 +1,14 @@
 "use client";
 
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
+import { PlatformOverview } from "@/components/dashboard/PlatformOverview";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { UserButton } from "@clerk/nextjs";
 
 export default function AnalyticsPage() {
-  const posts = useQuery(api.posts.getPosts, { authorId: "user-1" });
+  const posts = useQuery(api.posts.getPosts);
 
   if (posts === undefined) {
     return (
@@ -28,20 +29,15 @@ export default function AnalyticsPage() {
         <header className="flex justify-between items-center mb-8 glass-card p-4 rounded-xl shrink-0">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
-              Analytics
+              Dashboard
             </h1>
             <p className="text-slate-500">
-              Measure performance across all your connected channels
+              Welcome back! Here&apos;s your content overview.
             </p>
           </div>
 
           <div className="flex items-center gap-4">
-            <Avatar className="w-10 h-10 border border-slate-300">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-slate-200 text-slate-600 font-medium">
-                U
-              </AvatarFallback>
-            </Avatar>
+            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </header>
 
@@ -49,6 +45,9 @@ export default function AnalyticsPage() {
         <div className="flex-1 w-full min-w-0">
           <AnalyticsDashboard posts={posts} />
         </div>
+
+        {/* Platform Overview */}
+        <PlatformOverview posts={posts} />
       </main>
     </div>
   );

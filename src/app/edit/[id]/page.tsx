@@ -1,7 +1,6 @@
 "use client";
 
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -12,6 +11,7 @@ import { useRouter, useParams } from "next/navigation";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { format } from "date-fns";
+import { UserButton } from "@clerk/nextjs";
 
 export default function EditPostPage() {
   const params = useParams();
@@ -69,6 +69,7 @@ function EditPostContent({
     return {
       content: post.content,
       imageUrl: post.imageUrl || "",
+      imageId: post.imageId,
       platforms: [post.platform],
       scheduledDate,
       scheduledTime,
@@ -88,6 +89,7 @@ function EditPostContent({
         content: formData.content,
         status,
         imageUrl: formData.imageUrl || undefined,
+        imageId: formData.imageId,
         scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
       });
 
@@ -116,12 +118,7 @@ function EditPostContent({
                 Cancel
               </Button>
             </Link>
-            <Avatar className="w-10 h-10 border border-slate-300">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-slate-200 text-slate-600 font-medium">
-                U
-              </AvatarFallback>
-            </Avatar>
+            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </header>
 

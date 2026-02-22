@@ -15,7 +15,7 @@ import { PostPreviewModal } from "@/components/shared/PostPreviewModal";
 type FilterStatus = "all" | "draft" | "scheduled" | "published";
 
 export default function PostsPage() {
-  const posts = useQuery(api.posts.getPosts, { authorId: "user-1" });
+  const posts = useQuery(api.posts.getPosts);
   const deletePost = useMutation(api.posts.deletePost);
   const [filter, setFilter] = useState<FilterStatus>("all");
 

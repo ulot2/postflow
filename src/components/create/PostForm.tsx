@@ -1,10 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useMutation } from "convex/react";
+import { useState } from "react";
+import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
 
 export interface PostFormData {
   content: string;
   imageUrl?: string;
+  imageId?: Id<"_storage">;
   platforms: string[];
   scheduledDate: string;
   scheduledTime: string;
@@ -42,12 +47,52 @@ export function PostForm({
   onSubmit,
   isEditing,
 }: PostFormProps) {
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const [isUploading, setIsUploading] = useState(false);
+
   const togglePlatform = (id: string) => {
     if (isEditing) return; // Prevent changing platform
     const newPlatforms = data.platforms.includes(id)
       ? data.platforms.filter((p) => p !== id)
       : [...data.platforms, id];
     onChange({ ...data, platforms: newPlatforms });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      // 1. Show immediate local preview
+      const localUrl = URL.createObjectURL(file);
+      onChange({ ...data, imageUrl: localUrl });
+
+      // 2. Generate Convex upload URL
+      const uploadUrl = await generateUploadUrl();
+
+      // 3. POST file to Convex Storage
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      if (!result.ok) throw new Error("Upload failed");
+
+      const { storageId } = await result.json();
+
+      // 4. Update form data with the permanent storage ID
+      onChange({
+        ...data,
+        imageUrl: localUrl,
+        imageId: storageId as Id<"_storage">,
+      });
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -111,35 +156,49 @@ export function PostForm({
               placeholder="Paste image URL here..."
               title="Image URL"
               value={data.imageUrl || ""}
-              onChange={(e) => onChange({ ...data, imageUrl: e.target.value })}
+              onChange={(e) =>
+                onChange({
+                  ...data,
+                  imageUrl: e.target.value,
+                  imageId: undefined,
+                })
+              }
               className="flex-1 p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 bg-slate-50 text-sm"
+              disabled={isUploading}
             />
             <div className="relative flex items-center">
               <input
                 type="file"
                 accept="image/*"
                 title="Upload image"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
               />
               <Button
                 type="button"
                 variant="outline"
-                className="shadow-sm border-slate-300 relative z-0"
+                className="shadow-sm border-slate-300 relative z-0 min-w-[100px]"
+                disabled={isUploading}
               >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                  />
-                </svg>
-                Upload
+                {isUploading ? (
+                  <div className="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin mr-2" />
+                ) : (
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                    />
+                  </svg>
+                )}
+                {isUploading ? "Uploading..." : "Upload"}
               </Button>
             </div>
           </div>

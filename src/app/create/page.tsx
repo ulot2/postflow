@@ -1,7 +1,6 @@
 "use client";
 
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import { LivePreview } from "@/components/create/LivePreview";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
+import { UserButton } from "@clerk/nextjs";
 
 export default function CreatePostPage() {
   const router = useRouter();
@@ -37,9 +37,9 @@ export default function CreatePostPage() {
           createPost({
             content: formData.content,
             platform: platform as "twitter" | "linkedin" | "instagram",
-            authorId: "user-1", // Match MOCK_AUTHOR_ID in Calendar
             status,
             imageUrl: formData.imageUrl || undefined,
+            imageId: formData.imageId,
             scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
           }),
         ),
@@ -72,12 +72,7 @@ export default function CreatePostPage() {
                 Cancel
               </Button>
             </Link>
-            <Avatar className="w-10 h-10 border border-slate-300">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-slate-200 text-slate-600 font-medium">
-                U
-              </AvatarFallback>
-            </Avatar>
+            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </header>
 

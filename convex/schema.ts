@@ -15,6 +15,7 @@ export default defineSchema({
       v.literal("published"),
     ),
     imageUrl: v.optional(v.string()),
+    imageId: v.optional(v.id("_storage")), // Convex Storage ID
     scheduledDate: v.optional(v.number()), // Unix timestamp
     authorId: v.string(), // We will mock this for now
   }).index("by_status", ["status"]),
