@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { FileText, Calendar, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { UserButton, SignedIn } from "@clerk/nextjs";
+import { SignedIn } from "@clerk/nextjs";
+import { CustomUserButton } from "./CustomUserButton";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -63,7 +64,7 @@ export function Sidebar() {
       <div className="px-6 mt-auto">
         <SignedIn>
           <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white shadow-sm">
-            <UserButton afterSignOutUrl="/sign-in" showName />
+            <CustomUserButton />
           </div>
         </SignedIn>
       </div>

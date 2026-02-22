@@ -1,8 +1,10 @@
+"use client";
+
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/calendar/Calendar";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -23,16 +25,10 @@ export default function Home() {
             <Link href="/create" passHref>
               <Button className="shadow-md">+ New Post</Button>
             </Link>
-            <Avatar className="w-10 h-10 border border-slate-300">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-slate-200 text-slate-600 font-medium">
-                U
-              </AvatarFallback>
-            </Avatar>
+            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </header>
 
-        {/* Main Content Area (Calendar Grid will go here) */}
         <div className="h-[calc(100vh-140px)]">
           <Calendar />
         </div>

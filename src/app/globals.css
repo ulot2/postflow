@@ -5,14 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-background: #ffffff; /* Pure white */
-  --color-foreground: #09090b; /* Near black text */
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
 
-  --color-primary-500: #0f172a; /* Slate 900 for stark contrast */
-  --color-primary-600: #1e293b; /* Slate 800 */
-
-  --color-surface: #f8fafc; /* Slate 50 for cards */
-  --color-surface-hover: #f1f5f9; /* Slate 100 */
+  --color-primary-500: #0f172a;
+  --color-primary-600: #1e293b;
+  --color-surface: #f8fafc;
+  --color-surface-hover: #f1f5f9;
 
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
@@ -20,6 +19,53 @@
   --font-mono:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* ── PostFlow custom fonts ── */
+  --font-syne: var(--font-syne-base), sans-serif;
+  --font-instrument-sans: var(--font-instrument-base), sans-serif;
+
+  /* ── PostFlow keyframes (used via Tailwind arbitrary [animation:...] values) ── */
+  @keyframes floatA {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-1.5deg);
+    }
+    50% {
+      transform: translateY(-16px) rotate(-1.5deg);
+    }
+  }
+  @keyframes floatB {
+    0%,
+    100% {
+      transform: translateY(0) rotate(2deg);
+    }
+    50% {
+      transform: translateY(-12px) rotate(2deg);
+    }
+  }
+  @keyframes floatC {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes blinkDot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.25;
+    }
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 /* Base Styles */

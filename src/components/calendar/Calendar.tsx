@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { PostPreviewModal } from "../shared/PostPreviewModal";
+import { useAuth } from "@clerk/nextjs";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 

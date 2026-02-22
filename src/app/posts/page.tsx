@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Calendar, Trash2, Edit } from "lucide-react";
 import { FaXTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
@@ -44,7 +44,6 @@ export default function PostsPage() {
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 flex flex-col">
-        {/* Header */}
         <header className="flex justify-between items-start mb-8">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
@@ -61,7 +60,6 @@ export default function PostsPage() {
           </Link>
         </header>
 
-        {/* Filter Tabs */}
         <div className="flex bg-slate-100 rounded-full p-1.5 w-fit mb-8 gap-1">
           <button
             onClick={() => setFilter("all")}
@@ -105,7 +103,6 @@ export default function PostsPage() {
           </button>
         </div>
 
-        {/* Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredPosts?.map((post) => (
             <div
@@ -113,7 +110,6 @@ export default function PostsPage() {
               className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col h-[260px] hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => setSelectedPost(post)}
             >
-              {/* Card Header */}
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   {post.platform === "instagram" && (
@@ -178,7 +174,6 @@ export default function PostsPage() {
                 )}
               </div>
 
-              {/* Card Content */}
               <div className="flex-1 overflow-hidden mb-4 mt-2">
                 <p className="text-slate-600 text-[15px] line-clamp-3 break-all">
                   {post.content || (
@@ -189,7 +184,6 @@ export default function PostsPage() {
                 </p>
               </div>
 
-              {/* Date */}
               <div className="mt-auto flex justify-between items-end gap-2 mb-4">
                 <div className="flex items-start gap-2 text-slate-500">
                   <Calendar className="w-4 h-4 mt-0.5 shrink-0" />
@@ -211,7 +205,6 @@ export default function PostsPage() {
                 </div>
               </div>
 
-              {/* Buttons */}
               <div className="flex justify-between items-center gap-2 pt-4 border-t border-slate-100">
                 <Link
                   href={`/edit/${post._id}`}
