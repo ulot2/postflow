@@ -163,7 +163,7 @@ export default function SignUpPage() {
             <div className="inline-flex items-center gap-[6px] bg-[rgba(15,15,15,0.06)] border border-[#e0dbd3] rounded-full py-[4px] px-[11px] mb-[18px]">
               <div className="w-[6px] h-[6px] rounded-full bg-[#22c55e]" />
               <span className="text-[11.5px] font-semibold text-[#6b6b6b] font-syne tracking-[0.05em]">
-                Free forever plan available
+                Welcome to PostFlow!
               </span>
             </div>
 
@@ -174,7 +174,7 @@ export default function SignUpPage() {
             </h1>
 
             <p className="text-[#6b6b6b] text-[14.5px] leading-[1.55]">
-              No credit card. No fluff. Just PostFlow.
+              Your content, visualized. Just PostFlow.
             </p>
           </div>
 

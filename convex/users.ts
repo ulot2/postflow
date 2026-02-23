@@ -62,7 +62,12 @@ export const completeOnboarding = mutation({
     }
 
     const workspaceId = await ctx.db.insert("workspaces", {
-      name: args.type === "personal" ? "Personal Brand" : args.name!,
+      name:
+        args.type === "personal"
+          ? identity.givenName && identity.familyName
+            ? `${identity.givenName} ${identity.familyName}`
+            : (identity.givenName ?? identity.email!.split("@")[0])
+          : args.name!,
       description: args.description,
       type: args.type,
       userId: user._id,

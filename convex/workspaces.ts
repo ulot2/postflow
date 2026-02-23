@@ -102,3 +102,44 @@ export const createWorkspace = mutation({
     return workspaceId;
   },
 });
+
+export const updateWorkspace = mutation({
+  args: {
+    id: v.id("workspaces"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    brandLogoId: v.optional(v.id("_storage")),
+    removeLogo: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!user) throw new Error("User not found");
+
+    const workspace = await ctx.db.get(args.id);
+    if (!workspace || workspace.userId !== user._id) {
+      throw new Error("Workspace not found or access denied");
+    }
+
+    const patch: Record<string, unknown> = {};
+    if (args.name !== undefined) patch.name = args.name;
+    if (args.description !== undefined) patch.description = args.description;
+
+    if (args.removeLogo) {
+      patch.brandLogoId = undefined;
+      patch.brandLogoUrl = undefined;
+    } else if (args.brandLogoId) {
+      patch.brandLogoId = args.brandLogoId;
+      const url = await ctx.storage.getUrl(args.brandLogoId);
+      patch.brandLogoUrl = url ?? undefined;
+    }
+
+    await ctx.db.patch(args.id, patch);
+    return args.id;
+  },
+});

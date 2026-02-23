@@ -26,7 +26,7 @@ export function WorkspaceSwitcher() {
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/8 transition-colors cursor-pointer"
         >
           {/* Logo / Initials */}
           {activeWorkspace.brandLogoUrl ? (
@@ -82,7 +82,7 @@ export function WorkspaceSwitcher() {
                         setOpen(false);
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer ${
-                        isActive ? "bg-white/[0.08]" : "hover:bg-white/[0.05]"
+                        isActive ? "bg-white/8" : "hover:bg-white/5"
                       }`}
                     >
                       {ws.brandLogoUrl ? (
@@ -114,7 +114,7 @@ export function WorkspaceSwitcher() {
                     setOpen(false);
                     setModalOpen(true);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <div className="w-7 h-7 rounded-md border border-dashed border-white/20 flex items-center justify-center">
                     <Plus className="w-3.5 h-3.5" />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Calendar, LayoutDashboard } from "lucide-react";
+import { FileText, Calendar, LayoutDashboard, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SignedIn } from "@clerk/nextjs";
 import { CustomUserButton } from "./CustomUserButton";
@@ -28,6 +28,12 @@ export function Sidebar() {
       href: "/dashboard",
       icon: LayoutDashboard,
       isActive: pathname === "/dashboard",
+    },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: Settings,
+      isActive: pathname === "/settings",
     },
   ];
 
@@ -74,8 +80,8 @@ export function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-colors text-[14px] ${
                 item.isActive
-                  ? "bg-white/[0.1] text-white"
-                  : "text-white/50 hover:bg-white/[0.06] hover:text-white/80"
+                  ? "bg-white/10 text-white"
+                  : "text-white/50 hover:bg-white/6 hover:text-white/80"
               }`}
             >
               <Icon className="w-[18px] h-[18px]" />
@@ -88,7 +94,7 @@ export function Sidebar() {
       {/* User Section */}
       <div className="px-4 mt-auto">
         <SignedIn>
-          <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-white/[0.08] bg-white/[0.04]">
+          <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-white/8 bg-white/4">
             <CustomUserButton />
           </div>
         </SignedIn>
