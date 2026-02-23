@@ -221,9 +221,9 @@ export default function SignUpPage() {
           {!isGoogleLoading && (
             <>
               <div className="flex items-center gap-3 text-[#c0bbb3] text-[11.5px] font-syne font-semibold mb-4">
-                <div className="flex-1 h-[1px] bg-[#e0dbd3]" />
+                <div className="flex-1 h-px bg-[#e0dbd3]" />
                 or
-                <div className="flex-1 h-[1px] bg-[#e0dbd3]" />
+                <div className="flex-1 h-px bg-[#e0dbd3]" />
               </div>
 
               {/* Form */}

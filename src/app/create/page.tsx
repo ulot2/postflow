@@ -9,11 +9,12 @@ import { LivePreview } from "@/components/create/LivePreview";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
-import { UserButton } from "@clerk/nextjs";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 export default function CreatePostPage() {
   const router = useRouter();
   const createPost = useMutation(api.posts.createPost);
+  const { activeWorkspace } = useWorkspace();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<PostFormData>({
@@ -25,6 +26,7 @@ export default function CreatePostPage() {
   });
 
   const handleSubmit = async (status: "draft" | "scheduled") => {
+    if (!activeWorkspace) return;
     setIsSubmitting(true);
 
     try {
@@ -38,6 +40,7 @@ export default function CreatePostPage() {
             content: formData.content,
             platform: platform as "twitter" | "linkedin" | "instagram",
             status,
+            workspaceId: activeWorkspace._id,
             imageUrl: formData.imageUrl || undefined,
             imageId: formData.imageId,
             scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
@@ -53,36 +56,35 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 flex flex-col">
-        <header className="flex justify-between items-center mb-6 glass-card p-4 shrink-0 shadow-xs border border-white/40 rounded-2xl">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
+        <header className="flex justify-between items-center mb-6 bg-white border border-[#e0dbd3] p-4 shrink-0 rounded-xl">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
               Create Post
             </h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-[#6b6b6b]">
               Draft a new post and preview how it looks
             </p>
           </div>
 
           <div className="flex items-center gap-4">
             <Link href="/" passHref>
-              <Button variant="outline" className="shadow-sm">
+              <Button variant="outline" className="shadow-sm border-[#e0dbd3]">
                 Cancel
               </Button>
             </Link>
-            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </header>
 
         {/* Side-by-side Form and Preview */}
         <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
           {/* Left Side: Form */}
-          <div className="w-full lg:w-[45%] flex flex-col h-full bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-y-auto custom-scrollbar relative">
+          <div className="w-full lg:w-[45%] flex flex-col h-full bg-white rounded-2xl shadow-sm border border-[#e0dbd3] p-6 overflow-y-auto custom-scrollbar relative">
             {isSubmitting && (
               <div className="absolute inset-0 bg-white/60 backdrop-blur-xs z-10 flex items-center justify-center rounded-2xl">
-                <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
               </div>
             )}
             <PostForm
@@ -93,10 +95,10 @@ export default function CreatePostPage() {
           </div>
 
           {/* Right Side: Preview */}
-          <div className="w-full lg:w-[55%] flex flex-col h-full bg-slate-100 rounded-2xl shadow-inner border border-slate-200 p-6 overflow-y-auto custom-scrollbar relative">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4 shrink-0 px-2 flex items-center gap-2">
+          <div className="w-full lg:w-[55%] flex flex-col h-full bg-white/50 rounded-2xl shadow-inner border border-[#e0dbd3] p-6 overflow-y-auto custom-scrollbar relative">
+            <h3 className="text-lg font-semibold text-[#0f0f0f] mb-4 shrink-0 px-2 flex items-center gap-2 font-syne">
               <svg
-                className="w-5 h-5 text-slate-500"
+                className="w-5 h-5 text-[#6b6b6b]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

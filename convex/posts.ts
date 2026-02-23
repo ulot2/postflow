@@ -1,17 +1,15 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-// Trigger hot reload
 
 export const getPosts = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { workspaceId: v.id("workspaces") },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-    const authorId = identity.subject;
+    if (!identity) return [];
 
     const posts = await ctx.db
       .query("posts")
-      .filter((q) => q.eq(q.field("authorId"), authorId))
+      .withIndex("by_workspace", (q) => q.eq("workspaceId", args.workspaceId))
       .collect();
 
     return await Promise.all(
@@ -30,7 +28,7 @@ export const getPost = query({
   args: { id: v.id("posts") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    if (!identity) return null;
 
     const post = await ctx.db.get(args.id);
     if (!post || post.authorId !== identity.subject) return null;
@@ -46,17 +44,17 @@ export const getPost = query({
 
 export const getPostsInRange = query({
   args: {
+    workspaceId: v.id("workspaces"),
     startTs: v.number(),
     endTs: v.number(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-    const authorId = identity.subject;
+    if (!identity) return [];
 
     const all = await ctx.db
       .query("posts")
-      .filter((q) => q.eq(q.field("authorId"), authorId))
+      .withIndex("by_workspace", (q) => q.eq("workspaceId", args.workspaceId))
       .collect();
 
     const filtered = all.filter((p) => {
@@ -89,6 +87,7 @@ export const createPost = mutation({
       v.literal("scheduled"),
       v.literal("published"),
     ),
+    workspaceId: v.id("workspaces"),
     imageUrl: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
     scheduledDate: v.optional(v.number()),
@@ -102,6 +101,7 @@ export const createPost = mutation({
       platform: args.platform,
       status: args.status,
       authorId: identity.subject,
+      workspaceId: args.workspaceId,
       imageUrl: args.imageUrl,
       imageId: args.imageId,
       scheduledDate: args.scheduledDate,

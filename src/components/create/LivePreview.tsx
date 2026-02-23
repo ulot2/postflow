@@ -6,14 +6,18 @@ import {
   LinkedInPreview,
   InstagramPreview,
 } from "../shared/PlatformPreviews";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 export function LivePreview({ data }: { data: PostFormData }) {
+  const { activeWorkspace } = useWorkspace();
+  const brandName = activeWorkspace?.name ?? "Brand";
+
   if (data.platforms.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/50">
-        <div className="w-16 h-16 mb-4 rounded-full bg-slate-100 flex items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-[#e0dbd3] rounded-xl bg-[#f7f4ef]/50">
+        <div className="w-16 h-16 mb-4 rounded-full bg-white flex items-center justify-center">
           <svg
-            className="w-8 h-8 text-slate-400"
+            className="w-8 h-8 text-[#6b6b6b]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -32,10 +36,10 @@ export function LivePreview({ data }: { data: PostFormData }) {
             />
           </svg>
         </div>
-        <p className="text-slate-500 font-medium">
+        <p className="text-[#0f0f0f] font-medium">
           Select a platform to preview
         </p>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-[#6b6b6b] text-sm mt-1">
           Your post will appear here as you type
         </p>
       </div>
@@ -45,13 +49,25 @@ export function LivePreview({ data }: { data: PostFormData }) {
   return (
     <div className="flex-1 space-y-6 overflow-y-auto pb-6 custom-scrollbar pr-2">
       {data.platforms.includes("twitter") && (
-        <TwitterPreview content={data.content} imageUrl={data.imageUrl} />
+        <TwitterPreview
+          content={data.content}
+          imageUrl={data.imageUrl}
+          brandName={brandName}
+        />
       )}
       {data.platforms.includes("linkedin") && (
-        <LinkedInPreview content={data.content} imageUrl={data.imageUrl} />
+        <LinkedInPreview
+          content={data.content}
+          imageUrl={data.imageUrl}
+          brandName={brandName}
+        />
       )}
       {data.platforms.includes("instagram") && (
-        <InstagramPreview content={data.content} imageUrl={data.imageUrl} />
+        <InstagramPreview
+          content={data.content}
+          imageUrl={data.imageUrl}
+          brandName={brandName}
+        />
       )}
     </div>
   );

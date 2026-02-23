@@ -21,16 +21,18 @@ export function CustomUserButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center gap-3 outline-none hover:bg-slate-50 p-1 -m-1 rounded-lg transition-colors">
+        <button className="flex w-full items-center gap-3 outline-none hover:bg-white/[0.06] p-1 -m-1 rounded-lg transition-colors cursor-pointer">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.imageUrl} alt={user.fullName || ""} />
-            <AvatarFallback>{user.firstName?.charAt(0) || "U"}</AvatarFallback>
+            <AvatarFallback className="bg-[#d4f24a] text-[#0f0f0f] text-xs font-bold">
+              {user.firstName?.charAt(0) || "U"}
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-start truncate text-sm">
-            <span className="font-medium text-slate-900 truncate w-full">
+            <span className="font-medium text-white truncate w-full">
               {user.fullName || "User"}
             </span>
-            <span className="text-xs text-slate-500 truncate w-full flex text-left">
+            <span className="text-[11px] text-white/40 truncate w-full flex text-left">
               {user.primaryEmailAddress?.emailAddress}
             </span>
           </div>

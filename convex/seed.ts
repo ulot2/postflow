@@ -1,31 +1,18 @@
 import { mutation } from "./_generated/server";
 
+// The seed function is deprecated — posts now require a workspaceId.
+// Use the app's Create Post flow to add posts instead.
 export const populate = mutation({
   handler: async (ctx) => {
-    const today = new Date();
-    today.setHours(12, 0, 0, 0); // Noon today
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    await ctx.db.insert("posts", {
-      content:
-        "Excited to launch our new Content Planner! #SaaS #BuildInPublic",
-      platform: "twitter",
-      status: "scheduled",
-      scheduledDate: today.getTime(),
-      authorId: "user-1",
-    });
-
-    await ctx.db.insert("posts", {
-      content:
-        "Just published a new article on modern UI design with Shadcn and Tailwind.",
-      platform: "linkedin",
-      status: "scheduled",
-      scheduledDate: tomorrow.getTime(),
-      authorId: "user-1",
-    });
-
-    return "Seeded 2 mock posts!";
+    // Clear any old posts that don't have a workspaceId
+    const oldPosts = await ctx.db.query("posts").collect();
+    let deleted = 0;
+    for (const post of oldPosts) {
+      if (!post.workspaceId) {
+        await ctx.db.delete(post._id);
+        deleted++;
+      }
+    }
+    return `Cleaned up ${deleted} legacy posts without workspaceId.`;
   },
 });

@@ -11,6 +11,8 @@
 import type * as files from "../files.js";
 import type * as posts from "../posts.js";
 import type * as seed from "../seed.js";
+import type * as users from "../users.js";
+import type * as workspaces from "../workspaces.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +24,8 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   posts: typeof posts;
   seed: typeof seed;
+  users: typeof users;
+  workspaces: typeof workspaces;
 }>;
 
 /**

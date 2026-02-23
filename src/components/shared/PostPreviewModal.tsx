@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -17,6 +19,7 @@ import { api } from "../../../convex/_generated/api";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Id } from "../../../convex/_generated/dataModel";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 interface Post {
   _id: Id<"posts">;
@@ -41,6 +44,7 @@ export function PostPreviewModal({
   onClose,
 }: PostPreviewModalProps) {
   const deletePost = useMutation(api.posts.deletePost);
+  const { activeWorkspace } = useWorkspace();
 
   const handleDelete = async () => {
     if (!post) return;
@@ -52,11 +56,13 @@ export function PostPreviewModal({
 
   if (!post) return null;
 
+  const brandName = activeWorkspace?.name ?? "Brand";
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col pt-8">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col pt-8 bg-[#f7f4ef] border-[#e0dbd3]">
         <DialogHeader className="mb-4">
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-[#0f0f0f] font-syne">
             Post Preview
             {post.status === "scheduled" && (
               <span className="bg-blue-100 text-blue-600 px-2.5 py-0.5 rounded-full text-xs font-medium lowercase">
@@ -70,10 +76,10 @@ export function PostPreviewModal({
             )}
           </DialogTitle>
           <DialogDescription className="flex flex-col gap-2 mt-2">
-            <span className="flex items-center gap-2 text-slate-600">
+            <span className="flex items-center gap-2 text-[#6b6b6b]">
               <Calendar className="w-4 h-4 shrink-0" />
               <span>
-                {post.status === "draft" ? "Draft saved" : "Scheduled for "}
+                {post.status === "draft" ? "Draft saved " : "Scheduled for "}
                 {post.scheduledDate
                   ? format(
                       new Date(post.scheduledDate),
@@ -82,7 +88,7 @@ export function PostPreviewModal({
                   : "No date set"}
               </span>
             </span>
-            <span className="flex items-center gap-2 text-slate-600">
+            <span className="flex items-center gap-2 text-[#6b6b6b]">
               <Info className="w-4 h-4 shrink-0" />
               <span className="capitalize">
                 {post.platform} formatting applied
@@ -91,23 +97,35 @@ export function PostPreviewModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-slate-100 -mx-6 p-6 border-t border-slate-200 flex-1">
+        <div className="bg-white -mx-6 p-6 border-t border-[#e0dbd3] flex-1">
           {post.platform === "twitter" && (
-            <TwitterPreview content={post.content} imageUrl={post.imageUrl} />
+            <TwitterPreview
+              content={post.content}
+              imageUrl={post.imageUrl}
+              brandName={brandName}
+            />
           )}
           {post.platform === "linkedin" && (
-            <LinkedInPreview content={post.content} imageUrl={post.imageUrl} />
+            <LinkedInPreview
+              content={post.content}
+              imageUrl={post.imageUrl}
+              brandName={brandName}
+            />
           )}
           {post.platform === "instagram" && (
-            <InstagramPreview content={post.content} imageUrl={post.imageUrl} />
+            <InstagramPreview
+              content={post.content}
+              imageUrl={post.imageUrl}
+              brandName={brandName}
+            />
           )}
         </div>
 
-        <div className="flex justify-between items-center gap-2 pt-4 mt-2 border-t border-slate-100">
+        <div className="flex justify-between items-center gap-2 pt-4 mt-2 border-t border-[#e0dbd3]">
           <Link href={`/edit/${post._id}`} passHref className="flex-1">
             <Button
               variant="outline"
-              className="w-full h-10 text-slate-700 font-medium border-slate-200"
+              className="w-full h-10 text-[#0f0f0f] font-medium border-[#e0dbd3]"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit
@@ -115,7 +133,7 @@ export function PostPreviewModal({
           </Link>
           <Button
             variant="outline"
-            className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-slate-200"
+            className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-[#e0dbd3]"
             onClick={handleDelete}
           >
             <Trash2 className="w-4 h-4" />

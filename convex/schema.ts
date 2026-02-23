@@ -17,12 +17,32 @@ export default defineSchema({
     imageUrl: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")), // Convex Storage ID
     scheduledDate: v.optional(v.number()), // Unix timestamp
-    authorId: v.string(), // We will mock this for now
-  }).index("by_status", ["status"]),
+    authorId: v.string(),
+    workspaceId: v.id("workspaces"),
+  })
+    .index("by_status", ["status"])
+    .index("by_workspace", ["workspaceId"]),
 
   accounts: defineTable({
     name: v.string(),
     platform: v.string(),
     handle: v.string(),
   }),
+
+  users: defineTable({
+    clerkId: v.string(),
+    email: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    hasCompletedOnboarding: v.boolean(),
+  }).index("by_clerk_id", ["clerkId"]),
+
+  workspaces: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    type: v.union(v.literal("personal"), v.literal("company")),
+    userId: v.id("users"),
+    brandLogoUrl: v.optional(v.string()),
+    brandLogoId: v.optional(v.id("_storage")),
+  }).index("by_user", ["userId"]),
 });

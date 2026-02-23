@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { PostPreviewModal } from "../shared/PostPreviewModal";
-import { useAuth } from "@clerk/nextjs";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
@@ -59,6 +59,7 @@ function DroppableDayZone({
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { activeWorkspace } = useWorkspace();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
@@ -115,10 +116,12 @@ export function Calendar() {
   const startTs = useMemo(() => startOfDay(gridStart).getTime(), [gridStart]);
   const endTs = useMemo(() => endOfDay(gridEnd).getTime(), [gridEnd]);
 
-  const postsInRange = useQuery(api.posts.getPostsInRange, {
-    startTs,
-    endTs,
-  });
+  const postsInRange = useQuery(
+    api.posts.getPostsInRange,
+    activeWorkspace
+      ? { workspaceId: activeWorkspace._id, startTs, endTs }
+      : "skip",
+  );
 
   const postsByDayKey = useMemo(() => {
     const map = new Map<number, NonNullable<typeof postsInRange>>();
@@ -146,7 +149,7 @@ export function Calendar() {
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between px-1 pb-4">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
             {format(currentDate, "MMMM yyyy")}
           </h1>
 
@@ -154,7 +157,7 @@ export function Calendar() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50"
+              className="h-9 w-9 rounded-lg border-[#e0dbd3] text-[#6b6b6b] hover:bg-white cursor-pointer"
               onClick={handlePrevMonth}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -162,7 +165,7 @@ export function Calendar() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-lg border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border-[#e0dbd3] px-4 text-sm font-medium text-[#0f0f0f] hover:bg-white cursor-pointer"
               onClick={handleToday}
             >
               Today
@@ -170,7 +173,7 @@ export function Calendar() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50"
+              className="h-9 w-9 rounded-lg border-[#e0dbd3] text-[#6b6b6b] hover:bg-white cursor-pointer"
               onClick={handleNextMonth}
             >
               <ChevronRight className="h-4 w-4" />
@@ -179,13 +182,13 @@ export function Calendar() {
         </div>
 
         {/* ── Calendar grid ── */}
-        <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-slate-200 bg-white">
+        <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-[#e0dbd3] bg-white">
           {/* Day-of-week header */}
-          <div className="calendar-grid-7 border-b border-slate-200 bg-slate-50/80">
+          <div className="calendar-grid-7 border-b border-[#e0dbd3] bg-[#faf8f4]">
             {DAY_LABELS.map((label) => (
               <div
                 key={label}
-                className="border-r border-slate-200 px-3 py-2.5 text-center text-xs font-semibold text-slate-500 last:border-r-0"
+                className="border-r border-[#e0dbd3] px-3 py-2.5 text-center text-xs font-semibold text-[#6b6b6b] last:border-r-0"
               >
                 {label}
               </div>
@@ -200,7 +203,7 @@ export function Calendar() {
             {Array.from({ length: weekCount }).map((_, weekIdx) => (
               <div
                 key={weekIdx}
-                className="calendar-grid-7 border-b border-slate-200 last:border-b-0"
+                className="calendar-grid-7 border-b border-[#e0dbd3] last:border-b-0"
               >
                 {calendarDays.slice(weekIdx * 7, weekIdx * 7 + 7).map((day) => {
                   const dayKey = startOfDay(day).getTime();
@@ -212,8 +215,8 @@ export function Calendar() {
                     <div
                       key={day.toISOString()}
                       className={[
-                        "flex flex-col min-h-0 border-r border-slate-200 last:border-r-0",
-                        !inMonth ? "bg-slate-50/60" : "bg-white",
+                        "flex flex-col min-h-0 border-r border-[#e0dbd3] last:border-r-0",
+                        !inMonth ? "bg-[#faf8f4]/60" : "bg-white",
                       ].join(" ")}
                     >
                       {/* Day number */}
@@ -222,10 +225,10 @@ export function Calendar() {
                           className={[
                             "text-sm",
                             today
-                              ? "font-bold text-blue-500"
+                              ? "font-bold text-[#d4f24a] bg-[#0f0f0f] w-6 h-6 rounded-full flex items-center justify-center"
                               : inMonth
-                                ? "font-medium text-slate-800"
-                                : "font-medium text-slate-300",
+                                ? "font-medium text-[#0f0f0f]"
+                                : "font-medium text-[#c5c0b8]",
                           ].join(" ")}
                         >
                           {format(day, "d")}
