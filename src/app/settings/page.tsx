@@ -4,17 +4,35 @@ import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WorkspaceSettings } from "@/components/settings/WorkspaceSettings";
 import { AccountSettings } from "@/components/settings/AccountSettings";
-import { Briefcase, User } from "lucide-react";
+import { ConnectedAccounts } from "@/components/settings/ConnectedAccounts";
+import { Briefcase, User, Link2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const tabs = [
   { id: "workspace" as const, label: "Workspace", icon: Briefcase },
   { id: "account" as const, label: "Account", icon: User },
+  { id: "accounts" as const, label: "Connected Accounts", icon: Link2 },
 ];
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<"workspace" | "account">(
-    "workspace",
-  );
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState<
+    "workspace" | "account" | "accounts"
+  >("workspace");
+
+  const [prevTabParam, setPrevTabParam] = useState(tabParam);
+  if (tabParam !== prevTabParam) {
+    setPrevTabParam(tabParam);
+    if (
+      tabParam === "accounts" ||
+      tabParam === "account" ||
+      tabParam === "workspace"
+    ) {
+      setActiveTab(tabParam);
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-[#f7f4ef]">
@@ -54,6 +72,8 @@ export default function SettingsPage() {
           {/* Tab Content */}
           {activeTab === "workspace" ? (
             <WorkspaceSettings />
+          ) : activeTab === "accounts" ? (
+            <ConnectedAccounts />
           ) : (
             <AccountSettings />
           )}

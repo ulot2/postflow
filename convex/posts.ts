@@ -81,6 +81,7 @@ export const createPost = mutation({
       v.literal("twitter"),
       v.literal("linkedin"),
       v.literal("instagram"),
+      v.literal("pinterest"),
     ),
     status: v.union(
       v.literal("draft"),

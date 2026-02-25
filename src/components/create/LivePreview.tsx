@@ -5,6 +5,7 @@ import {
   TwitterPreview,
   LinkedInPreview,
   InstagramPreview,
+  PinterestPreview,
 } from "../shared/PlatformPreviews";
 import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
@@ -64,6 +65,13 @@ export function LivePreview({ data }: { data: PostFormData }) {
       )}
       {data.platforms.includes("instagram") && (
         <InstagramPreview
+          content={data.content}
+          imageUrl={data.imageUrl}
+          brandName={brandName}
+        />
+      )}
+      {data.platforms.includes("pinterest") && (
+        <PinterestPreview
           content={data.content}
           imageUrl={data.imageUrl}
           brandName={brandName}

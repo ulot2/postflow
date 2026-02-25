@@ -11,6 +11,7 @@ import {
   TwitterPreview,
   LinkedInPreview,
   InstagramPreview,
+  PinterestPreview,
 } from "./PlatformPreviews";
 import { Calendar, Info, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ interface Post {
   scheduledDate?: number;
   imageUrl?: string;
   content: string;
-  platform: "twitter" | "linkedin" | "instagram";
+  platform: "twitter" | "linkedin" | "instagram" | "pinterest";
   authorId: string;
   status: "draft" | "scheduled" | "published";
 }
@@ -114,6 +115,13 @@ export function PostPreviewModal({
           )}
           {post.platform === "instagram" && (
             <InstagramPreview
+              content={post.content}
+              imageUrl={post.imageUrl}
+              brandName={brandName}
+            />
+          )}
+          {post.platform === "pinterest" && (
+            <PinterestPreview
               content={post.content}
               imageUrl={post.imageUrl}
               brandName={brandName}

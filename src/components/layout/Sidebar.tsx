@@ -6,9 +6,14 @@ import { usePathname } from "next/navigation";
 import { SignedIn } from "@clerk/nextjs";
 import { CustomUserButton } from "./CustomUserButton";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { useWorkspaceAccounts } from "@/lib/useWorkspaceAccounts";
+import { useWorkspace } from "../providers/WorkspaceContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { activeWorkspace } = useWorkspace();
+  const { accounts } = useWorkspaceAccounts(activeWorkspace?._id);
 
   const navItems = [
     {
@@ -90,6 +95,51 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Connected Accounts Indicator */}
+      {accounts.length > 0 && (
+        <div className="px-5 mb-4">
+          <Link
+            href="/settings?tab=accounts"
+            className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
+          >
+            <div className="flex flex-col">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5">
+                Accounts
+              </span>
+              <div className="flex -space-x-2">
+                {accounts.map((account, i) => (
+                  <Avatar
+                    key={account._id}
+                    className={`w-6 h-6 border-2 border-[#0f0f0f] relative z-[${10 - i}]`}
+                  >
+                    {account.avatarUrl && (
+                      <AvatarImage src={account.avatarUrl} />
+                    )}
+                    <AvatarFallback className="bg-[#d4f24a] text-[#0f0f0f] text-[10px] font-bold">
+                      {account.handle.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#d4f24a] group-hover:text-[#0f0f0f] text-white/50 transition-colors">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* User Section */}
       <div className="px-4 mt-auto">

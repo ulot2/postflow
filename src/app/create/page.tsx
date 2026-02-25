@@ -38,7 +38,11 @@ export default function CreatePostPage() {
         formData.platforms.map((platform) =>
           createPost({
             content: formData.content,
-            platform: platform as "twitter" | "linkedin" | "instagram",
+            platform: platform as
+              | "twitter"
+              | "linkedin"
+              | "instagram"
+              | "pinterest",
             status,
             workspaceId: activeWorkspace._id,
             imageUrl: formData.imageUrl || undefined,

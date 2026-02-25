@@ -21,7 +21,7 @@ export function CustomUserButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center gap-3 outline-none hover:bg-white/[0.06] p-1 -m-1 rounded-lg transition-colors cursor-pointer">
+        <button className="flex w-full items-center gap-3 outline-none hover:bg-white/6 p-1 -m-1 rounded-lg transition-colors cursor-pointer">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.imageUrl} alt={user.fullName || ""} />
             <AvatarFallback className="bg-[#d4f24a] text-[#0f0f0f] text-xs font-bold">

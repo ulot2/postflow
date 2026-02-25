@@ -8,6 +8,7 @@ export default defineSchema({
       v.literal("twitter"),
       v.literal("linkedin"),
       v.literal("instagram"),
+      v.literal("pinterest"),
     ),
     status: v.union(
       v.literal("draft"),
@@ -24,10 +25,32 @@ export default defineSchema({
     .index("by_workspace", ["workspaceId"]),
 
   accounts: defineTable({
-    name: v.string(),
-    platform: v.string(),
+    platform: v.union(
+      v.literal("twitter"),
+      v.literal("linkedin"),
+      v.literal("instagram"),
+      v.literal("pinterest"),
+    ),
+    platformAccountId: v.string(),
     handle: v.string(),
-  }),
+    displayName: v.string(),
+    avatarUrl: v.optional(v.string()),
+    accessToken: v.string(),
+    refreshToken: v.optional(v.string()),
+    tokenExpiresAt: v.optional(v.number()),
+    scopes: v.optional(v.string()),
+    status: v.union(
+      v.literal("active"),
+      v.literal("expired"),
+      v.literal("revoked"),
+    ),
+    workspaceId: v.id("workspaces"),
+    userId: v.id("users"),
+    connectedAt: v.number(),
+  })
+    .index("by_workspace", ["workspaceId"])
+    .index("by_user", ["userId"])
+    .index("by_platform_account", ["platform", "platformAccountId"]),
 
   users: defineTable({
     clerkId: v.string(),

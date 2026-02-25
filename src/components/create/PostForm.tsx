@@ -39,6 +39,11 @@ const AVAILABLE_PLATFORMS = [
     color:
       "bg-linear-to-tr from-yellow-400 via-red-500 to-purple-500 text-white hover:opacity-90",
   },
+  {
+    id: "pinterest",
+    label: "Pinterest",
+    color: "bg-[#E60023] text-white hover:bg-[#c5001e]",
+  },
 ];
 
 export function PostForm({

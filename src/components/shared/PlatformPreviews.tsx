@@ -185,3 +185,64 @@ export function InstagramPreview({
     </div>
   );
 }
+
+export function PinterestPreview({
+  content,
+  imageUrl,
+  brandName = "Brand",
+}: PreviewProps) {
+  const [title, ...descParts] = content.split("\n");
+  const description = descParts.join("\n").trim();
+
+  return (
+    <div className="bg-white rounded-3xl overflow-hidden shadow-xs max-w-[300px] mx-auto border border-[#e0dbd3]">
+      <div className="relative w-full aspect-2/3 bg-[#f7f4ef]">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt="Pinterest preview"
+            className="w-full h-full object-cover"
+            width={500}
+            height={750}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-[#6b6b6b] p-6 text-center border-b border-[#e0dbd3]">
+            {title ? (
+              <span className="font-bold text-xl text-[#0f0f0f]">{title}</span>
+            ) : (
+              <span>Image Required for Pinterest</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 flex flex-col gap-2">
+        <div className="flex justify-between items-start gap-2">
+          <h3 className="font-bold text-[#0f0f0f] text-lg leading-tight line-clamp-2 wrap-break-word">
+            {title || "Pin Title"}
+          </h3>
+          <div className="bg-[#E60023] text-white rounded-full px-4 py-2 shrink-0 cursor-pointer text-sm font-bold">
+            Save
+          </div>
+        </div>
+
+        {description && (
+          <p className="text-[#0f0f0f] text-sm line-clamp-3 mb-2">
+            {description}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 mt-2">
+          <Avatar className="w-8 h-8 rounded-full border border-[#e0dbd3]">
+            <AvatarFallback className="bg-[#f7f4ef] text-[#0f0f0f] text-xs font-bold">
+              {brandName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-[#0f0f0f] text-sm font-medium">
+            {brandName}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
