@@ -9,7 +9,7 @@ export const publish = action({
     workspaceId: v.id("workspaces"),
     content: v.string(),
     platform: v.literal("linkedin"),
-    imageUrl: v.optional(v.string()),
+    imageUrls: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     try {
@@ -30,64 +30,70 @@ export const publish = action({
       }
 
       const personUrn = `urn:li:person:${linkedinAccount.platformAccountId}`;
-      let assetUrn: string | undefined;
+      const assetUrns: string[] = [];
 
-      // 2. If there's an image, we need to upload it to LinkedIn first
-      if (args.imageUrl) {
-        // Download the image
-        const imageRes = await fetch(args.imageUrl);
-        if (!imageRes.ok) throw new Error("Failed to download image to upload");
-        const imageBuffer = await imageRes.arrayBuffer();
+      // 2. If there are images, we need to upload them to LinkedIn first
+      if (args.imageUrls && args.imageUrls.length > 0) {
+        // Upload all images sequentially (or concurrently if preferred)
+        for (const url of args.imageUrls) {
+          // Download the image
+          const imageRes = await fetch(url);
+          if (!imageRes.ok)
+            throw new Error("Failed to download image to upload");
+          const imageBuffer = await imageRes.arrayBuffer();
 
-        // Register the upload
-        const registerBody = {
-          registerUploadRequest: {
-            recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-            owner: personUrn,
-            serviceRelationships: [
-              {
-                relationshipType: "OWNER",
-                identifier: "urn:li:userGeneratedContent",
-              },
-            ],
-          },
-        };
-
-        const registerRes = await fetch(
-          "https://api.linkedin.com/v2/assets?action=registerUpload",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${linkedinAccount.accessToken}`,
-              "Content-Type": "application/json",
+          // Register the upload
+          const registerBody = {
+            registerUploadRequest: {
+              recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
+              owner: personUrn,
+              serviceRelationships: [
+                {
+                  relationshipType: "OWNER",
+                  identifier: "urn:li:userGeneratedContent",
+                },
+              ],
             },
-            body: JSON.stringify(registerBody),
-          },
-        );
+          };
 
-        if (!registerRes.ok) {
-          throw new Error(
-            `Failed to register upload: ${await registerRes.text()}`,
+          const registerRes = await fetch(
+            "https://api.linkedin.com/v2/assets?action=registerUpload",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${linkedinAccount.accessToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(registerBody),
+            },
           );
-        }
 
-        const registerData = await registerRes.json();
-        const uploadUrl =
-          registerData.value.uploadMechanism[
-            "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
-          ].uploadUrl;
-        assetUrn = registerData.value.asset;
+          if (!registerRes.ok) {
+            throw new Error(
+              `Failed to register upload: ${await registerRes.text()}`,
+            );
+          }
 
-        // Upload the actual binary chunks
-        const uploadRes = await fetch(uploadUrl, {
-          method: "POST", // The docs say POST or PUT, url signed handles it
-          body: imageBuffer,
-        });
+          const registerData = await registerRes.json();
+          const uploadUrl =
+            registerData.value.uploadMechanism[
+              "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+            ].uploadUrl;
+          const currentAssetUrn = registerData.value.asset;
 
-        if (!uploadRes.ok) {
-          throw new Error(
-            `Failed to upload image to LinkedIn: ${await uploadRes.text()}`,
-          );
+          // Upload the actual binary chunks
+          const uploadRes = await fetch(uploadUrl, {
+            method: "POST", // The docs say POST or PUT, url signed handles it
+            body: imageBuffer,
+          });
+
+          if (!uploadRes.ok) {
+            throw new Error(
+              `Failed to upload image to LinkedIn: ${await uploadRes.text()}`,
+            );
+          }
+
+          assetUrns.push(currentAssetUrn);
         }
       }
 
@@ -96,17 +102,15 @@ export const publish = action({
         shareCommentary: {
           text: args.content,
         },
-        shareMediaCategory: assetUrn ? "IMAGE" : "NONE",
+        shareMediaCategory: assetUrns.length > 0 ? "IMAGE" : "NONE",
       };
 
-      if (assetUrn) {
-        shareContent.media = [
-          {
-            status: "READY",
-            description: { text: "Post image" },
-            media: assetUrn,
-          },
-        ];
+      if (assetUrns.length > 0) {
+        shareContent.media = assetUrns.map((urn) => ({
+          status: "READY",
+          description: { text: "Post image" },
+          media: urn,
+        }));
       }
 
       const specificContent = {

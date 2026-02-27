@@ -67,8 +67,8 @@ function EditPostContent({
 
     return {
       content: post.content,
-      imageUrl: post.imageUrl || "",
-      imageId: post.imageId,
+      imageUrls: post.imageUrls || [],
+      imageIds: post.imageIds || [],
       platforms: [post.platform],
       scheduledDate,
       scheduledTime,
@@ -87,8 +87,8 @@ function EditPostContent({
         id: postId,
         content: formData.content,
         status,
-        imageUrl: formData.imageUrl || undefined,
-        imageId: formData.imageId,
+        imageUrls: formData.imageUrls,
+        imageIds: formData.imageIds,
         scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
       });
 

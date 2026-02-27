@@ -52,28 +52,28 @@ export function LivePreview({ data }: { data: PostFormData }) {
       {data.platforms.includes("twitter") && (
         <TwitterPreview
           content={data.content}
-          imageUrl={data.imageUrl}
+          imageUrls={data.imageUrls}
           brandName={brandName}
         />
       )}
       {data.platforms.includes("linkedin") && (
         <LinkedInPreview
           content={data.content}
-          imageUrl={data.imageUrl}
+          imageUrls={data.imageUrls}
           brandName={brandName}
         />
       )}
       {data.platforms.includes("instagram") && (
         <InstagramPreview
           content={data.content}
-          imageUrl={data.imageUrl}
+          imageUrls={data.imageUrls}
           brandName={brandName}
         />
       )}
       {data.platforms.includes("pinterest") && (
         <PinterestPreview
           content={data.content}
-          imageUrl={data.imageUrl}
+          imageUrls={data.imageUrls}
           brandName={brandName}
         />
       )}

@@ -26,7 +26,7 @@ interface Post {
   _id: Id<"posts">;
   _creationTime: number;
   scheduledDate?: number;
-  imageUrl?: string;
+  imageUrls?: string[];
   content: string;
   platform: "twitter" | "linkedin" | "instagram" | "pinterest";
   authorId: string;
@@ -102,28 +102,28 @@ export function PostPreviewModal({
           {post.platform === "twitter" && (
             <TwitterPreview
               content={post.content}
-              imageUrl={post.imageUrl}
+              imageUrls={post.imageUrls}
               brandName={brandName}
             />
           )}
           {post.platform === "linkedin" && (
             <LinkedInPreview
               content={post.content}
-              imageUrl={post.imageUrl}
+              imageUrls={post.imageUrls}
               brandName={brandName}
             />
           )}
           {post.platform === "instagram" && (
             <InstagramPreview
               content={post.content}
-              imageUrl={post.imageUrl}
+              imageUrls={post.imageUrls}
               brandName={brandName}
             />
           )}
           {post.platform === "pinterest" && (
             <PinterestPreview
               content={post.content}
-              imageUrl={post.imageUrl}
+              imageUrls={post.imageUrls}
               brandName={brandName}
             />
           )}

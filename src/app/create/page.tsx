@@ -19,7 +19,7 @@ export default function CreatePostPage() {
 
   const [formData, setFormData] = useState<PostFormData>({
     content: "",
-    imageUrl: "",
+    imageUrls: [],
     platforms: ["twitter"],
     scheduledDate: new Date().toISOString().split("T")[0],
     scheduledTime: "12:00",
@@ -45,8 +45,8 @@ export default function CreatePostPage() {
               | "pinterest",
             status,
             workspaceId: activeWorkspace._id,
-            imageUrl: formData.imageUrl || undefined,
-            imageId: formData.imageId,
+            imageUrls: formData.imageUrls,
+            imageIds: formData.imageIds,
             scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
           }),
         ),

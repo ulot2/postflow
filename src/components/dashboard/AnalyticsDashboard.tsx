@@ -27,11 +27,11 @@ interface Post {
   _id: Id<"posts">;
   _creationTime: number;
   scheduledDate?: number;
-  imageUrl?: string;
+  imageUrls?: string[];
   content: string;
-  platform: "twitter" | "linkedin" | "instagram";
+  platform: "twitter" | "linkedin" | "instagram" | "pinterest";
   authorId: string;
-  status: "draft" | "scheduled" | "published";
+  status: "draft" | "scheduled" | "published" | "failed" | "publishing";
 }
 
 export function AnalyticsDashboard({ posts }: { posts: Post[] }) {

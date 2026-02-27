@@ -17,8 +17,10 @@ export default defineSchema({
       v.literal("published"),
       v.literal("failed"),
     ),
-    imageUrl: v.optional(v.string()),
-    imageId: v.optional(v.id("_storage")), // Convex Storage ID
+    imageUrl: v.optional(v.string()), // Legacy field
+    imageId: v.optional(v.id("_storage")), // Legacy field
+    imageUrls: v.optional(v.array(v.string())),
+    imageIds: v.optional(v.array(v.id("_storage"))), // Convex Storage IDs
     scheduledDate: v.optional(v.number()), // Unix timestamp
     authorId: v.string(),
     workspaceId: v.id("workspaces"),

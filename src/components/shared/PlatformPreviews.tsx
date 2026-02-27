@@ -13,13 +13,13 @@ import {
 
 interface PreviewProps {
   content: string;
-  imageUrl?: string;
+  imageUrls?: string[];
   brandName?: string;
 }
 
 export function TwitterPreview({
   content,
-  imageUrl,
+  imageUrls,
   brandName = "Brand",
 }: PreviewProps) {
   const handle = `@${brandName.toLowerCase().replace(/\s+/g, "")}`;
@@ -45,15 +45,32 @@ export function TwitterPreview({
         <p className="text-[15px] text-[#0f0f0f] whitespace-pre-wrap break-all border-b border-transparent mb-2">
           {content || "What's happening?"}
         </p>
-        {imageUrl && (
-          <div className="mt-2 rounded-xl overflow-hidden border border-[#e0dbd3]">
-            <Image
-              src={imageUrl}
-              alt="Post media"
-              className="w-full h-auto max-h-80 object-cover"
-              width={500}
-              height={500}
-            />
+        {imageUrls && imageUrls.length > 0 && (
+          <div
+            className={`mt-2 rounded-xl overflow-hidden border border-[#e0dbd3] grid gap-0.5 ${
+              imageUrls.length === 1
+                ? "grid-cols-1"
+                : imageUrls.length === 2
+                  ? "grid-cols-2 aspect-[16/9]"
+                  : imageUrls.length === 3
+                    ? "grid-cols-2 aspect-[16/9]"
+                    : "grid-cols-2 aspect-square"
+            }`}
+          >
+            {imageUrls.map((url, i) => (
+              <div
+                key={i}
+                className={`relative bg-[#f7f4ef] ${
+                  imageUrls.length === 3 && i === 0 ? "row-span-2" : ""
+                }`}
+              >
+                <img
+                  src={url}
+                  alt={`Media ${i + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         )}
         <div className="flex justify-between mt-3 text-[#6b6b6b] max-w-md">
@@ -81,7 +98,7 @@ export function TwitterPreview({
 
 export function LinkedInPreview({
   content,
-  imageUrl,
+  imageUrls,
   brandName = "Brand",
 }: PreviewProps) {
   return (
@@ -106,15 +123,32 @@ export function LinkedInPreview({
         <p className="text-sm text-[#0f0f0f] whitespace-pre-wrap break-all mb-3 text-ellipsis">
           {content || "What do you want to talk about?"}
         </p>
-        {imageUrl && (
-          <div className="-mx-4 bg-[#f7f4ef] mt-2">
-            <Image
-              src={imageUrl}
-              alt="Post media"
-              className="w-full h-auto max-h-96 object-contain"
-              width={500}
-              height={500}
-            />
+        {imageUrls && imageUrls.length > 0 && (
+          <div
+            className={`-mx-4 bg-[#f7f4ef] mt-2 grid gap-1 ${
+              imageUrls.length === 1
+                ? "grid-cols-1"
+                : imageUrls.length === 2
+                  ? "grid-cols-2 aspect-[16/9]"
+                  : imageUrls.length === 3
+                    ? "grid-cols-2 aspect-[16/9]"
+                    : "grid-cols-2 aspect-square"
+            }`}
+          >
+            {imageUrls.map((url, i) => (
+              <div
+                key={i}
+                className={`relative bg-black/5 ${
+                  imageUrls.length === 3 && i === 0 ? "row-span-2" : ""
+                } ${imageUrls.length === 1 ? "aspect-square max-h-96" : "w-full h-full"}`}
+              >
+                <img
+                  src={url}
+                  alt={`Media ${i + 1}`}
+                  className={`${imageUrls.length === 1 ? "w-full h-auto max-h-96 object-contain" : "absolute inset-0 w-full h-full object-cover"}`}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -138,7 +172,7 @@ export function LinkedInPreview({
 
 export function InstagramPreview({
   content,
-  imageUrl,
+  imageUrls,
   brandName = "Brand",
 }: PreviewProps) {
   const handle = brandName.toLowerCase().replace(/\s+/g, "");
@@ -155,15 +189,34 @@ export function InstagramPreview({
         </div>
         <span className="font-bold text-[#0f0f0f] text-sm">{handle}</span>
       </div>
-      <div className="w-full aspect-square bg-[#f7f4ef] flex items-center justify-center overflow-hidden">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt="Post media"
-            className="w-full h-full object-cover"
-            width={500}
-            height={500}
-          />
+      <div className="w-full aspect-square bg-[#f7f4ef] flex items-center justify-center overflow-hidden relative">
+        {imageUrls && imageUrls.length > 0 ? (
+          <>
+            <img
+              src={imageUrls[0]}
+              alt="Post media"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {imageUrls.length > 1 && (
+              <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm z-10 flex items-center shadow-xs">
+                <svg
+                  className="w-3 h-3 mr-1"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4 6H20M4 12H20M4 18H20"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                1/{imageUrls.length}
+              </div>
+            )}
+          </>
         ) : (
           <span className="text-[#6b6b6b]">Media Area</span>
         )}
@@ -188,7 +241,7 @@ export function InstagramPreview({
 
 export function PinterestPreview({
   content,
-  imageUrl,
+  imageUrls,
   brandName = "Brand",
 }: PreviewProps) {
   const [title, ...descParts] = content.split("\n");
@@ -196,14 +249,12 @@ export function PinterestPreview({
 
   return (
     <div className="bg-white rounded-3xl overflow-hidden shadow-xs max-w-[300px] mx-auto border border-[#e0dbd3]">
-      <div className="relative w-full aspect-2/3 bg-[#f7f4ef]">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
+      <div className="relative w-full aspect-2/3 bg-[#f7f4ef] overflow-hidden">
+        {imageUrls && imageUrls.length > 0 ? (
+          <img
+            src={imageUrls[0]}
             alt="Pinterest preview"
-            className="w-full h-full object-cover"
-            width={500}
-            height={750}
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-[#6b6b6b] p-6 text-center border-b border-[#e0dbd3]">

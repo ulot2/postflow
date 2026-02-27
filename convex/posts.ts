@@ -15,11 +15,14 @@ export const getPosts = query({
 
     return await Promise.all(
       posts.map(async (post) => {
-        let imageUrl = post.imageUrl;
-        if (post.imageId) {
-          imageUrl = (await ctx.storage.getUrl(post.imageId)) ?? undefined;
+        let imageUrls = post.imageUrls;
+        if (post.imageIds && post.imageIds.length > 0) {
+          const resolvedUrls = await Promise.all(
+            post.imageIds.map((id) => ctx.storage.getUrl(id)),
+          );
+          imageUrls = resolvedUrls.filter((url): url is string => url !== null);
         }
-        return { ...post, imageUrl };
+        return { ...post, imageUrls };
       }),
     );
   },
@@ -34,12 +37,15 @@ export const getPost = query({
     const post = await ctx.db.get(args.id);
     if (!post || post.authorId !== identity.subject) return null;
 
-    let imageUrl = post.imageUrl;
-    if (post.imageId) {
-      imageUrl = (await ctx.storage.getUrl(post.imageId)) ?? undefined;
+    let imageUrls = post.imageUrls;
+    if (post.imageIds && post.imageIds.length > 0) {
+      const resolvedUrls = await Promise.all(
+        post.imageIds.map((id) => ctx.storage.getUrl(id)),
+      );
+      imageUrls = resolvedUrls.filter((url): url is string => url !== null);
     }
 
-    return { ...post, imageUrl };
+    return { ...post, imageUrls };
   },
 });
 
@@ -65,11 +71,14 @@ export const getPostsInRange = query({
 
     return await Promise.all(
       filtered.map(async (post) => {
-        let imageUrl = post.imageUrl;
-        if (post.imageId) {
-          imageUrl = (await ctx.storage.getUrl(post.imageId)) ?? undefined;
+        let imageUrls = post.imageUrls;
+        if (post.imageIds && post.imageIds.length > 0) {
+          const resolvedUrls = await Promise.all(
+            post.imageIds.map((id) => ctx.storage.getUrl(id)),
+          );
+          imageUrls = resolvedUrls.filter((url): url is string => url !== null);
         }
-        return { ...post, imageUrl };
+        return { ...post, imageUrls };
       }),
     );
   },
@@ -92,8 +101,8 @@ export const createPost = mutation({
       v.literal("failed"),
     ),
     workspaceId: v.id("workspaces"),
-    imageUrl: v.optional(v.string()),
-    imageId: v.optional(v.id("_storage")),
+    imageUrls: v.optional(v.array(v.string())),
+    imageIds: v.optional(v.array(v.id("_storage"))),
     scheduledDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -106,8 +115,8 @@ export const createPost = mutation({
       status: args.status,
       authorId: identity.subject,
       workspaceId: args.workspaceId,
-      imageUrl: args.imageUrl,
-      imageId: args.imageId,
+      imageUrls: args.imageUrls,
+      imageIds: args.imageIds,
       scheduledDate: args.scheduledDate,
     });
   },
@@ -124,8 +133,8 @@ export const updatePost = mutation({
       v.literal("published"),
       v.literal("failed"),
     ),
-    imageUrl: v.optional(v.string()),
-    imageId: v.optional(v.id("_storage")),
+    imageUrls: v.optional(v.array(v.string())),
+    imageIds: v.optional(v.array(v.id("_storage"))),
     scheduledDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -140,8 +149,8 @@ export const updatePost = mutation({
     return await ctx.db.patch(args.id, {
       content: args.content,
       status: args.status,
-      imageUrl: args.imageUrl,
-      imageId: args.imageId,
+      imageUrls: args.imageUrls,
+      imageIds: args.imageIds,
       scheduledDate: args.scheduledDate,
     });
   },
@@ -228,9 +237,14 @@ export const publishScheduledPosts = mutation({
       // Mark as publishing to avoid double execution
       await ctx.db.patch(post._id, { status: "publishing" });
 
-      let finalImageUrl = post.imageUrl;
-      if (post.imageId) {
-        finalImageUrl = (await ctx.storage.getUrl(post.imageId)) ?? undefined;
+      let finalImageUrls = post.imageUrls;
+      if (post.imageIds && post.imageIds.length > 0) {
+        const resolvedUrls = await Promise.all(
+          post.imageIds.map((id) => ctx.storage.getUrl(id)),
+        );
+        finalImageUrls = resolvedUrls.filter(
+          (url): url is string => url !== null,
+        );
       }
 
       // Trigger the appropriate action based on the platform
@@ -240,7 +254,7 @@ export const publishScheduledPosts = mutation({
           workspaceId: post.workspaceId,
           content: post.content,
           platform: post.platform,
-          imageUrl: finalImageUrl,
+          imageUrls: finalImageUrls,
         });
       } else {
         // Platform not supported yet

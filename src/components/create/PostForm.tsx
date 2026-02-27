@@ -8,8 +8,8 @@ import { Id } from "../../../convex/_generated/dataModel";
 
 export interface PostFormData {
   content: string;
-  imageUrl?: string;
-  imageId?: Id<"_storage">;
+  imageUrls?: string[];
+  imageIds?: Id<"_storage">[];
   platforms: string[];
   scheduledDate: string;
   scheduledTime: string;
@@ -64,40 +64,67 @@ export function PostForm({
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     setIsUploading(true);
     try {
-      // 1. Show immediate local preview
-      const localUrl = URL.createObjectURL(file);
-      onChange({ ...data, imageUrl: localUrl });
+      const newLocalUrls = files.map((file) => URL.createObjectURL(file));
+      const currentImageUrls = data.imageUrls || [];
+      const currentImageIds = data.imageIds || [];
 
-      // 2. Generate Convex upload URL
-      const uploadUrl = await generateUploadUrl();
-
-      // 3. POST file to Convex Storage
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-
-      if (!result.ok) throw new Error("Upload failed");
-
-      const { storageId } = await result.json();
-
-      // 4. Update form data with the permanent storage ID
+      // 1. Show immediate local previews
       onChange({
         ...data,
-        imageUrl: localUrl,
-        imageId: storageId as Id<"_storage">,
+        imageUrls: [...currentImageUrls, ...newLocalUrls],
+      });
+
+      const uploadedIds: Id<"_storage">[] = [];
+
+      // Upload all files sequentially (or Promise.all if preferred, but sequential is safer for now)
+      for (const file of files) {
+        const uploadUrl = await generateUploadUrl();
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+
+        if (!result.ok) throw new Error("Upload failed");
+        const { storageId } = await result.json();
+        uploadedIds.push(storageId as Id<"_storage">);
+      }
+
+      // 4. Update form data with final URLs and Storage IDs
+      onChange({
+        ...data,
+        imageUrls: [...currentImageUrls, ...newLocalUrls],
+        imageIds: [...currentImageIds, ...uploadedIds],
       });
     } catch (error) {
-      console.error("Failed to upload image:", error);
+      console.error("Failed to upload images:", error);
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const removeImage = (index: number) => {
+    const newImageUrls = [...(data.imageUrls || [])];
+    const newImageIds = [...(data.imageIds || [])];
+
+    newImageUrls.splice(index, 1);
+
+    // Only splice imageIds if we actually have that many
+    // (e.g. if dealing with external URLs without Storage IDs)
+    if (newImageIds.length > index) {
+      newImageIds.splice(index, 1);
+    }
+
+    onChange({
+      ...data,
+      imageUrls: newImageUrls,
+      imageIds: newImageIds,
+    });
   };
 
   return (
@@ -153,21 +180,53 @@ export function PostForm({
         {/* Image Upload */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Add an Image (Optional)
+            Add Images (Optional)
           </label>
+
+          {/* Thumbnails Grid */}
+          {data.imageUrls && data.imageUrls.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {data.imageUrls.map((url, idx) => (
+                <div
+                  key={idx}
+                  className="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={`Upload ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-6 h-6 hover:bg-red-600 shadow-xs"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="flex gap-2">
             <input
               type="text"
               placeholder="Paste image URL here..."
               title="Image URL"
-              value={data.imageUrl || ""}
-              onChange={(e) =>
-                onChange({
-                  ...data,
-                  imageUrl: e.target.value,
-                  imageId: undefined,
-                })
-              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const val = e.currentTarget.value;
+                  if (val) {
+                    onChange({
+                      ...data,
+                      imageUrls: [...(data.imageUrls || []), val],
+                    });
+                    e.currentTarget.value = "";
+                  }
+                }
+              }}
               className="flex-1 p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 bg-slate-50 text-sm"
               disabled={isUploading}
             />
@@ -175,7 +234,8 @@ export function PostForm({
               <input
                 type="file"
                 accept="image/*"
-                title="Upload image"
+                multiple
+                title="Upload images"
                 onChange={handleImageUpload}
                 disabled={isUploading}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
@@ -203,7 +263,7 @@ export function PostForm({
                     />
                   </svg>
                 )}
-                {isUploading ? "Uploading..." : "Upload"}
+                {isUploading ? "Uploading..." : "Upload..."}
               </Button>
             </div>
           </div>

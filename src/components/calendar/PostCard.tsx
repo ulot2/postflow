@@ -2,10 +2,15 @@
 
 import { cn } from "@/lib/utils";
 import { useDraggable } from "@dnd-kit/core";
-import { FaXTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaPinterestP,
+} from "react-icons/fa6";
 
-type Platform = "twitter" | "linkedin" | "instagram";
-type Status = "draft" | "scheduled" | "published";
+type Platform = "twitter" | "linkedin" | "instagram" | "pinterest";
+type Status = "draft" | "scheduled" | "publishing" | "published" | "failed";
 
 interface PostCardProps {
   id: string;
@@ -32,12 +37,18 @@ const platformStyles: Record<
     styles: "bg-pink-50 text-pink-700 border-pink-100",
     Icon: FaInstagram,
   },
+  pinterest: {
+    styles: "bg-red-50 text-red-700 border-red-100",
+    Icon: FaPinterestP,
+  },
 };
 
 const statusStyles: Record<Status, string> = {
   draft: "bg-amber-50 text-amber-700 border-amber-100",
   scheduled: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  publishing: "bg-indigo-50 text-indigo-700 border-indigo-100",
   published: "bg-slate-50 text-slate-700 border-slate-200",
+  failed: "bg-red-50 text-red-700 border-red-200",
 };
 
 export function PostCard({
