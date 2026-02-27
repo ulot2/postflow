@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 
 export const getAccountsByWorkspace = query({
   args: { workspaceId: v.id("workspaces") },
@@ -7,6 +7,16 @@ export const getAccountsByWorkspace = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
+    return await ctx.db
+      .query("accounts")
+      .withIndex("by_workspace", (q) => q.eq("workspaceId", args.workspaceId))
+      .collect();
+  },
+});
+
+export const getAccountsByWorkspaceInternal = internalQuery({
+  args: { workspaceId: v.id("workspaces") },
+  handler: async (ctx, args) => {
     return await ctx.db
       .query("accounts")
       .withIndex("by_workspace", (q) => q.eq("workspaceId", args.workspaceId))

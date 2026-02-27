@@ -1,4 +1,5 @@
 import { query, mutation } from "./_generated/server";
+import { api } from "./_generated/api";
 import { v } from "convex/values";
 
 export const getPosts = query({
@@ -86,7 +87,9 @@ export const createPost = mutation({
     status: v.union(
       v.literal("draft"),
       v.literal("scheduled"),
+      v.literal("publishing"),
       v.literal("published"),
+      v.literal("failed"),
     ),
     workspaceId: v.id("workspaces"),
     imageUrl: v.optional(v.string()),
@@ -117,7 +120,9 @@ export const updatePost = mutation({
     status: v.union(
       v.literal("draft"),
       v.literal("scheduled"),
+      v.literal("publishing"),
       v.literal("published"),
+      v.literal("failed"),
     ),
     imageUrl: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
@@ -175,5 +180,72 @@ export const deletePost = mutation({
     }
 
     return await ctx.db.delete(args.id);
+  },
+});
+
+export const updatePostStatus = mutation({
+  args: {
+    id: v.id("posts"),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("publishing"),
+      v.literal("published"),
+      v.literal("failed"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    // This is called by our internal actions, so we don't strictly require an identity
+    // But we still verify the post exists
+    const existing = await ctx.db.get(args.id);
+    if (!existing) {
+      throw new Error("Post not found");
+    }
+
+    return await ctx.db.patch(args.id, {
+      status: args.status,
+    });
+  },
+});
+
+export const publishScheduledPosts = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+
+    // Get all scheduled posts
+    const scheduledPosts = await ctx.db
+      .query("posts")
+      .withIndex("by_status", (q) => q.eq("status", "scheduled"))
+      .collect();
+
+    // Filter posts that are due to be published
+    const duePosts = scheduledPosts.filter(
+      (post) => post.scheduledDate && post.scheduledDate <= now,
+    );
+
+    for (const post of duePosts) {
+      // Mark as publishing to avoid double execution
+      await ctx.db.patch(post._id, { status: "publishing" });
+
+      let finalImageUrl = post.imageUrl;
+      if (post.imageId) {
+        finalImageUrl = (await ctx.storage.getUrl(post.imageId)) ?? undefined;
+      }
+
+      // Trigger the appropriate action based on the platform
+      if (post.platform === "linkedin") {
+        await ctx.scheduler.runAfter(0, api.actions.linkedin.publish, {
+          postId: post._id,
+          workspaceId: post.workspaceId,
+          content: post.content,
+          platform: post.platform,
+          imageUrl: finalImageUrl,
+        });
+      } else {
+        // Platform not supported yet
+        await ctx.db.patch(post._id, { status: "failed" });
+      }
+    }
   },
 });

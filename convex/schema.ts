@@ -13,7 +13,9 @@ export default defineSchema({
     status: v.union(
       v.literal("draft"),
       v.literal("scheduled"),
+      v.literal("publishing"),
       v.literal("published"),
+      v.literal("failed"),
     ),
     imageUrl: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")), // Convex Storage ID
