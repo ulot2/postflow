@@ -51,9 +51,9 @@ export function TwitterPreview({
               imageUrls.length === 1
                 ? "grid-cols-1"
                 : imageUrls.length === 2
-                  ? "grid-cols-2 aspect-[16/9]"
+                  ? "grid-cols-2 aspect-video"
                   : imageUrls.length === 3
-                    ? "grid-cols-2 aspect-[16/9]"
+                    ? "grid-cols-2 aspect-video"
                     : "grid-cols-2 aspect-square"
             }`}
           >
@@ -64,9 +64,11 @@ export function TwitterPreview({
                   imageUrls.length === 3 && i === 0 ? "row-span-2" : ""
                 }`}
               >
-                <img
+                <Image
                   src={url}
                   alt={`Media ${i + 1}`}
+                  width={100}
+                  height={100}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
@@ -129,9 +131,9 @@ export function LinkedInPreview({
               imageUrls.length === 1
                 ? "grid-cols-1"
                 : imageUrls.length === 2
-                  ? "grid-cols-2 aspect-[16/9]"
+                  ? "grid-cols-2 aspect-video"
                   : imageUrls.length === 3
-                    ? "grid-cols-2 aspect-[16/9]"
+                    ? "grid-cols-2 aspect-video"
                     : "grid-cols-2 aspect-square"
             }`}
           >
@@ -142,9 +144,11 @@ export function LinkedInPreview({
                   imageUrls.length === 3 && i === 0 ? "row-span-2" : ""
                 } ${imageUrls.length === 1 ? "aspect-square max-h-96" : "w-full h-full"}`}
               >
-                <img
+                <Image
                   src={url}
                   alt={`Media ${i + 1}`}
+                  width={100}
+                  height={100}
                   className={`${imageUrls.length === 1 ? "w-full h-auto max-h-96 object-contain" : "absolute inset-0 w-full h-full object-cover"}`}
                 />
               </div>
@@ -192,9 +196,11 @@ export function InstagramPreview({
       <div className="w-full aspect-square bg-[#f7f4ef] flex items-center justify-center overflow-hidden relative">
         {imageUrls && imageUrls.length > 0 ? (
           <>
-            <img
+            <Image
               src={imageUrls[0]}
               alt="Post media"
+              width={100}
+              height={100}
               className="absolute inset-0 w-full h-full object-cover"
             />
             {imageUrls.length > 1 && (
@@ -251,9 +257,11 @@ export function PinterestPreview({
     <div className="bg-white rounded-3xl overflow-hidden shadow-xs max-w-[300px] mx-auto border border-[#e0dbd3]">
       <div className="relative w-full aspect-2/3 bg-[#f7f4ef] overflow-hidden">
         {imageUrls && imageUrls.length > 0 ? (
-          <img
+          <Image
             src={imageUrls[0]}
             alt="Pinterest preview"
+            width={100}
+            height={100}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (

@@ -8,6 +8,7 @@ import {
   FaLinkedinIn,
   FaPinterestP,
 } from "react-icons/fa6";
+import { Trash2, Pencil } from "lucide-react";
 
 type Platform = "twitter" | "linkedin" | "instagram" | "pinterest";
 type Status = "draft" | "scheduled" | "publishing" | "published" | "failed";
@@ -19,6 +20,8 @@ interface PostCardProps {
   timeLabel?: string;
   status: Status;
   onClick?: () => void;
+  onDelete?: (e: React.MouseEvent) => void;
+  onEdit?: (e: React.MouseEvent) => void;
 }
 
 const platformStyles: Record<
@@ -58,6 +61,8 @@ export function PostCard({
   timeLabel,
   status,
   onClick,
+  onDelete,
+  onEdit,
 }: PostCardProps) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
@@ -78,10 +83,28 @@ export function PostCard({
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:shadow-md",
+        "group relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:shadow-md",
         transform ? "z-50 opacity-90 cursor-grabbing" : "cursor-grab",
       )}
     >
+      {/* Absolute Hover Actions */}
+      <div className="absolute left-2 top-2 z-10 hidden items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm group-hover:flex">
+        <button
+          onClick={onEdit}
+          className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-blue-600"
+          title="Edit Post"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-red-600"
+          title="Delete Post"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
       <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
@@ -101,11 +124,24 @@ export function PostCard({
           )}
           <span
             className={cn(
-              "inline-flex items-center rounded-full border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em]",
+              "group/tooltip relative inline-flex items-center rounded-full border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em]",
               statusStyles[status],
             )}
           >
             {status}
+            {status === "scheduled" && platform !== "linkedin" && (
+              <>
+                <span className="ml-1 cursor-help text-amber-500">⚠️</span>
+                {/* Custom Tooltip */}
+                <div className="absolute bottom-full left-1/2 z-50 mb-2 hidden w-48 -translate-x-1/2 rounded-md border border-slate-200 bg-white p-2 text-center text-[0.75rem] font-normal normal-case leading-snug tracking-normal text-slate-700 shadow-lg group-hover/tooltip:block">
+                  <span className="block font-semibold text-slate-900 mb-0.5">
+                    Manual Action Required
+                  </span>
+                  Auto-publishing is not yet supported for this platform.
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
+                </div>
+              </>
+            )}
           </span>
         </div>
       </div>

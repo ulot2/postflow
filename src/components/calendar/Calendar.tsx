@@ -11,6 +11,7 @@ import {
 import { useMutation } from "convex/react";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   addDays,
   addMonths,
@@ -65,6 +66,8 @@ export function Calendar() {
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
 
   const updateSchedule = useMutation(api.posts.updateSchedule);
+  const deletePost = useMutation(api.posts.deletePost);
+  const router = useRouter();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -254,6 +257,20 @@ export function Calendar() {
                               }
                               status={post.status}
                               onClick={() => setSelectedPost(post)}
+                              onEdit={(e) => {
+                                e.stopPropagation();
+                                router.push(`/edit/${post._id}`);
+                              }}
+                              onDelete={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    "Are you sure you want to delete this post?",
+                                  )
+                                ) {
+                                  deletePost({ id: post._id });
+                                }
+                              }}
                             />
                           ))}
                         </div>

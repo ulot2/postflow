@@ -229,8 +229,12 @@ export const publishScheduledPosts = mutation({
       .collect();
 
     // Filter posts that are due to be published
+    // ONLY support linkedin for now. Other platforms remain "scheduled"
     const duePosts = scheduledPosts.filter(
-      (post) => post.scheduledDate && post.scheduledDate <= now,
+      (post) =>
+        post.scheduledDate &&
+        post.scheduledDate <= now &&
+        post.platform === "linkedin",
     );
 
     for (const post of duePosts) {
@@ -256,9 +260,6 @@ export const publishScheduledPosts = mutation({
           platform: post.platform,
           imageUrls: finalImageUrls,
         });
-      } else {
-        // Platform not supported yet
-        await ctx.db.patch(post._id, { status: "failed" });
       }
     }
   },
