@@ -67,6 +67,7 @@ export function Calendar() {
 
   const updateSchedule = useMutation(api.posts.updateSchedule);
   const deletePost = useMutation(api.posts.deletePost);
+  const updatePostStatus = useMutation(api.posts.updatePostStatus);
   const router = useRouter();
 
   const sensors = useSensors(
@@ -270,6 +271,13 @@ export function Calendar() {
                                 ) {
                                   deletePost({ id: post._id });
                                 }
+                              }}
+                              onPublish={(e) => {
+                                e.stopPropagation();
+                                updatePostStatus({
+                                  id: post._id,
+                                  status: "published",
+                                });
                               }}
                             />
                           ))}
