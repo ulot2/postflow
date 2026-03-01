@@ -266,15 +266,9 @@ export function Calendar() {
                               }}
                               onDelete={(e) => {
                                 e.stopPropagation();
-                                if (
-                                  confirm(
-                                    "Are you sure you want to delete this post?",
-                                  )
-                                ) {
-                                  deletePost({ id: post._id }).then(() => {
-                                    toast.success("Post deleted");
-                                  });
-                                }
+                                deletePost({ id: post._id }).then(() => {
+                                  toast.success("Post deleted");
+                                });
                               }}
                               onPublish={(e) => {
                                 e.stopPropagation();

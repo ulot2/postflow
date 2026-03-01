@@ -61,6 +61,8 @@ const statusStyles: Record<Status, string> = {
   failed: "bg-red-50 text-red-700 border-red-200",
 };
 
+import { ConfirmDeletePopover } from "../shared/ConfirmDeletePopover";
+
 export function PostCard({
   id,
   platform,
@@ -96,7 +98,10 @@ export function PostCard({
       )}
     >
       {/* Absolute Hover Actions */}
-      <div className="absolute right-2 bottom-2 z-10 hidden items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm group-hover:flex">
+      <div
+        className="absolute right-2 bottom-2 z-10 flex opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto has-data-[state=open]:opacity-100 has-data-[state=open]:pointer-events-auto items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm"
+        onPointerDown={(e) => e.stopPropagation()} // Stop drag when interacting with buttons
+      >
         {status === "scheduled" && platform !== "linkedin" && (
           <button
             onClick={onPublish}
@@ -113,13 +118,24 @@ export function PostCard({
         >
           <Pencil className="h-3.5 w-3.5" />
         </button>
-        <button
-          onClick={onDelete}
-          className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-red-600"
-          title="Delete Post"
+
+        <ConfirmDeletePopover
+          onConfirm={() => {
+            if (onDelete) {
+              onDelete({
+                stopPropagation: () => {},
+              } as unknown as React.MouseEvent);
+            }
+          }}
         >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-red-600"
+            title="Delete Post"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </ConfirmDeletePopover>
       </div>
 
       <div className="flex items-center justify-between gap-2">

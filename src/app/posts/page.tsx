@@ -17,6 +17,8 @@ import { format } from "date-fns";
 import { Id } from "../../../convex/_generated/dataModel";
 import { PostPreviewModal } from "@/components/shared/PostPreviewModal";
 import { useWorkspace } from "@/components/providers/WorkspaceContext";
+import { ConfirmDeletePopover } from "@/components/shared/ConfirmDeletePopover";
+import { toast } from "sonner";
 
 type FilterStatus = "all" | "draft" | "scheduled" | "published";
 
@@ -45,9 +47,8 @@ export default function PostsPage() {
   });
 
   const handleDelete = async (id: Id<"posts">) => {
-    if (confirm("Are you sure you want to delete this post?")) {
-      await deletePost({ id });
-    }
+    await deletePost({ id });
+    toast.success("Post deleted");
   };
 
   const brandName = activeWorkspace?.name ?? "Brand";
@@ -234,16 +235,21 @@ export default function PostsPage() {
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                    <ConfirmDeletePopover
+                      onConfirm={() => {
                         handleDelete(post._id);
                       }}
-                      className="p-2 rounded-xl text-[#6b6b6b] hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Delete Post"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="p-2 rounded-xl text-[#6b6b6b] hover:text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete Post"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </ConfirmDeletePopover>
                   </div>
                 </div>
               </div>

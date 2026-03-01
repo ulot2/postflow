@@ -49,7 +49,7 @@ export function TwitterPreview({
           <div
             className={`mt-2 rounded-xl overflow-hidden border border-[#e0dbd3] grid gap-0.5 ${
               imageUrls.length === 1
-                ? "grid-cols-1"
+                ? "grid-cols-1 aspect-video"
                 : imageUrls.length === 2
                   ? "grid-cols-2 aspect-video"
                   : imageUrls.length === 3
