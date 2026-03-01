@@ -13,6 +13,7 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
+  startOfDay,
 } from "date-fns";
 import {
   ChevronLeft,
@@ -120,13 +121,13 @@ export function CustomDatePicker({ value, onChange }: CustomDatePickerProps) {
                     onChange(format(day, "yyyy-MM-dd"));
                     setIsOpen(false);
                   }}
-                  disabled={day < startOfMonth(new Date()) && !isTodayDate} // Prevent past dates, but allow today
+                  disabled={day < startOfDay(new Date()) && !isTodayDate} // Prevent past dates, but allow today
                   className={`
                     h-9 w-9 rounded-full flex items-center justify-center transition-all
                     ${!isCurrentMonth ? "text-slate-300 pointer-events-none" : "text-slate-700"}
                     ${isSelected ? "bg-slate-900 text-white shadow-md scale-105" : "hover:bg-slate-100"}
                     ${isTodayDate && !isSelected ? "border border-slate-300 text-slate-900 font-bold" : ""}
-                    ${day < startOfMonth(new Date()) && !isTodayDate ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}
+                    ${day < startOfDay(new Date()) && !isTodayDate ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}
                   `}
                 >
                   {format(day, "d")}

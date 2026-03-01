@@ -35,6 +35,12 @@ export default function CreatePostPage() {
         `${formData.scheduledDate}T${formData.scheduledTime}`,
       ).getTime();
 
+      if (status === "scheduled" && scheduledDateTs < Date.now()) {
+        toast.error("Cannot schedule posts in the past");
+        setIsSubmitting(false);
+        return;
+      }
+
       await Promise.all(
         formData.platforms.map((platform) =>
           createPost({

@@ -85,6 +85,12 @@ export function Calendar() {
 
     const postId = active.id as string;
     const newDateMs = over.data.current?.date as number;
+    const todayDateMs = startOfDay(new Date()).getTime();
+
+    if (newDateMs < todayDateMs) {
+      toast.error("Cannot schedule posts in the past");
+      return;
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await updateSchedule({ id: postId as any, scheduledDate: newDateMs });

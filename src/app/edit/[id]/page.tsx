@@ -84,6 +84,12 @@ function EditPostContent({
         `${formData.scheduledDate}T${formData.scheduledTime}`,
       ).getTime();
 
+      if (status === "scheduled" && scheduledDateTs < Date.now()) {
+        toast.error("Cannot schedule posts in the past");
+        setIsSubmitting(false);
+        return;
+      }
+
       await updatePost({
         id: postId,
         content: formData.content,
