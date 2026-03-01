@@ -5,6 +5,8 @@ import { useMutation } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
+import { CustomDatePicker } from "./CustomDatePicker";
+import { CustomTimePicker } from "./CustomTimePicker";
 
 export interface PostFormData {
   content: string;
@@ -275,28 +277,18 @@ export function PostForm({
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Date
             </label>
-            <input
-              type="date"
-              title="Scheduled Date"
+            <CustomDatePicker
               value={data.scheduledDate}
-              onChange={(e) =>
-                onChange({ ...data, scheduledDate: e.target.value })
-              }
-              className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 bg-slate-50"
+              onChange={(value) => onChange({ ...data, scheduledDate: value })}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Time
             </label>
-            <input
-              type="time"
-              title="Scheduled Time"
+            <CustomTimePicker
               value={data.scheduledTime}
-              onChange={(e) =>
-                onChange({ ...data, scheduledTime: e.target.value })
-              }
-              className="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 bg-slate-50"
+              onChange={(value) => onChange({ ...data, scheduledTime: value })}
             />
           </div>
         </div>
