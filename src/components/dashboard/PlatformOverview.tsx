@@ -1,6 +1,11 @@
 "use client";
 
-import { FaXTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaPinterest,
+} from "react-icons/fa6";
 
 import { Id } from "../../../convex/_generated/dataModel";
 
@@ -22,6 +27,7 @@ export function PlatformOverview({ posts }: { posts: Post[] }) {
     twitter: 0,
     linkedin: 0,
     facebook: 0,
+    pinterest: 0,
   };
 
   posts.forEach((post) => {
@@ -29,6 +35,7 @@ export function PlatformOverview({ posts }: { posts: Post[] }) {
     if (post.platform === "instagram") counts.instagram++;
     if (post.platform === "twitter") counts.twitter++;
     if (post.platform === "linkedin") counts.linkedin++;
+    if (post.platform === "pinterest") counts.pinterest++;
   });
 
   const platformsData = [
@@ -52,6 +59,13 @@ export function PlatformOverview({ posts }: { posts: Post[] }) {
       icon: FaLinkedinIn,
       color: "text-blue-600",
       bg: "bg-blue-50",
+    },
+    {
+      name: "Pinterest",
+      count: counts.pinterest,
+      icon: FaPinterest,
+      color: "text-red-500",
+      bg: "bg-red-50",
     },
   ];
 

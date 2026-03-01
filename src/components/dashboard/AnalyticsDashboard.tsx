@@ -111,11 +111,17 @@ export function AnalyticsDashboard({ posts }: { posts: Post[] }) {
   );
 
   // 3. Platform Distribution Data
-  const platformCounts = { twitter: 0, linkedin: 0, instagram: 0 };
+  const platformCounts = {
+    twitter: 0,
+    linkedin: 0,
+    instagram: 0,
+    pinterest: 0,
+  };
   posts.forEach((post) => {
     if (post.platform === "twitter") platformCounts.twitter++;
     else if (post.platform === "linkedin") platformCounts.linkedin++;
     else if (post.platform === "instagram") platformCounts.instagram++;
+    else if (post.platform === "pinterest") platformCounts.pinterest++;
   });
 
   // Filter out any zero value platforms for the pie chart
@@ -123,6 +129,7 @@ export function AnalyticsDashboard({ posts }: { posts: Post[] }) {
     { name: "Twitter", value: platformCounts.twitter, fill: "#3b82f6" },
     { name: "LinkedIn", value: platformCounts.linkedin, fill: "#1d4ed8" },
     { name: "Instagram", value: platformCounts.instagram, fill: "#e11d48" },
+    { name: "Pinterest", value: platformCounts.pinterest, fill: "#ef4444" },
   ].filter((p) => p.value > 0);
 
   return (
