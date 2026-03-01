@@ -11,6 +11,7 @@ import { useRouter, useParams } from "next/navigation";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export default function EditPostPage() {
   const params = useParams();
@@ -92,6 +93,7 @@ function EditPostContent({
         scheduledDate: status === "scheduled" ? scheduledDateTs : undefined,
       });
 
+      toast.success("Post updated");
       router.push("/posts");
     } catch (error) {
       console.error("Failed to update post", error);

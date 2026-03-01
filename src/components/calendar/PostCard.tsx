@@ -96,7 +96,7 @@ export function PostCard({
       )}
     >
       {/* Absolute Hover Actions */}
-      <div className="absolute left-2 top-2 z-10 hidden items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm group-hover:flex">
+      <div className="absolute right-2 bottom-2 z-10 hidden items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm group-hover:flex">
         {status === "scheduled" && platform !== "linkedin" && (
           <button
             onClick={onPublish}

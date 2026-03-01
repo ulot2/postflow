@@ -10,6 +10,7 @@ import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import { useWorkspace } from "@/components/providers/WorkspaceContext";
+import { toast } from "sonner";
 
 export default function CreatePostPage() {
   const router = useRouter();
@@ -52,6 +53,9 @@ export default function CreatePostPage() {
         ),
       );
 
+      toast.success(
+        status === "scheduled" ? "Post scheduled" : "Post added to draft",
+      );
       router.push("/");
     } catch (error) {
       console.error("Failed to create post(s)", error);

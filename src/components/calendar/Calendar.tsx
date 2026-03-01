@@ -10,6 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { useMutation } from "convex/react";
 
+import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -87,6 +88,7 @@ export function Calendar() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await updateSchedule({ id: postId as any, scheduledDate: newDateMs });
+    toast.success("Post rescheduled");
   };
 
   /* ── Month-level date math ── */
@@ -269,7 +271,9 @@ export function Calendar() {
                                     "Are you sure you want to delete this post?",
                                   )
                                 ) {
-                                  deletePost({ id: post._id });
+                                  deletePost({ id: post._id }).then(() => {
+                                    toast.success("Post deleted");
+                                  });
                                 }
                               }}
                               onPublish={(e) => {
@@ -277,6 +281,8 @@ export function Calendar() {
                                 updatePostStatus({
                                   id: post._id,
                                   status: "published",
+                                }).then(() => {
+                                  toast.success("Post published");
                                 });
                               }}
                             />

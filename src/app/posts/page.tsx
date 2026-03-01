@@ -7,7 +7,12 @@ import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
 import Link from "next/link";
 import { Calendar, Trash2, Edit } from "lucide-react";
-import { FaXTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaPinterestP,
+} from "react-icons/fa6";
 import { format } from "date-fns";
 import { Id } from "../../../convex/_generated/dataModel";
 import { PostPreviewModal } from "@/components/shared/PostPreviewModal";
@@ -114,115 +119,133 @@ export default function PostsPage() {
           {filteredPosts?.map((post) => (
             <div
               key={post._id}
-              className="bg-white rounded-2xl border border-[#e0dbd3] p-5 shadow-xs flex flex-col h-[260px] hover:shadow-md hover:border-[#c5c0b8] transition-all cursor-pointer"
+              className="group relative bg-white rounded-3xl border border-[#e0dbd3] overflow-hidden shadow-sm flex flex-col hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-400 cursor-pointer"
               onClick={() => setSelectedPost(post)}
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  {post.platform === "instagram" && (
-                    <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shrink-0">
-                      <FaInstagram className="w-5 h-5" />
+              {/* Subtle top gradient depending on platform */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-1.5 opacity-80 ${
+                  post.platform === "instagram"
+                    ? "bg-linear-to-r from-pink-500 to-amber-500"
+                    : post.platform === "twitter"
+                      ? "bg-black"
+                      : post.platform === "pinterest"
+                        ? "bg-[#E60023]"
+                        : "bg-[#0a66c2]"
+                }`}
+              />
+
+              <div className="flex flex-col flex-1 p-6">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4 mt-1">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex shrink-0 items-center justify-center w-10 h-10 rounded-2xl ${
+                        post.platform === "instagram"
+                          ? "bg-linear-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white shadow-inner"
+                          : post.platform === "twitter"
+                            ? "bg-black text-white shadow-inner"
+                            : post.platform === "pinterest"
+                              ? "bg-[#E60023] text-white shadow-inner"
+                              : "bg-[#0a66c2] text-white shadow-inner"
+                      }`}
+                    >
+                      {post.platform === "instagram" && (
+                        <FaInstagram className="w-5 h-5" />
+                      )}
+                      {post.platform === "twitter" && (
+                        <FaXTwitter className="w-5 h-5" />
+                      )}
+                      {post.platform === "pinterest" && (
+                        <FaPinterestP className="w-5 h-5" />
+                      )}
+                      {post.platform === "linkedin" && (
+                        <FaLinkedinIn className="w-5 h-5" />
+                      )}
                     </div>
-                  )}
-                  {post.platform === "twitter" && (
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0">
-                      <FaXTwitter className="w-5 h-5" />
+                    <div className="flex flex-col">
+                      <span className="font-extrabold text-[#0f0f0f] text-[16px] tracking-tight leading-none mb-1">
+                        {brandName}
+                      </span>
+                      <span className="text-[#8c8c8c] text-[13px] font-medium leading-none">
+                        {post.platform === "instagram"
+                          ? "Instagram Post"
+                          : post.platform === "twitter"
+                            ? "X (Twitter) Post"
+                            : post.platform === "pinterest"
+                              ? "Pinterest Pin"
+                              : "LinkedIn Post"}
+                      </span>
                     </div>
-                  )}
-                  {post.platform === "linkedin" && (
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                      <FaLinkedinIn className="w-5 h-5 font-bold" />
-                    </div>
-                  )}
-                  <div className="flex flex-col">
-                    <span className="font-bold text-[#0f0f0f] text-[15px] leading-tight">
-                      {post.platform === "linkedin"
-                        ? brandName
-                        : `@${brandName.toLowerCase().replace(/\s+/g, "")}`}
-                    </span>
-                    <span className="text-[#6b6b6b] text-sm">
-                      {post.platform === "instagram"
-                        ? "Instagram"
-                        : post.platform === "twitter"
-                          ? "X"
-                          : "LinkedIn"}
-                    </span>
                   </div>
-                </div>
 
-                {post.status === "scheduled" && (
-                  <span className="bg-blue-100 text-blue-600 px-2.5 py-1 rounded-full text-xs font-medium lowercase">
-                    scheduled
-                  </span>
-                )}
-                {post.status === "draft" && (
-                  <span className="bg-amber-100 text-amber-600 px-2.5 py-1 rounded-full text-xs font-medium lowercase">
-                    draft
-                  </span>
-                )}
-                {post.status === "published" && (
-                  <span className="bg-emerald-100 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-medium lowercase">
-                    published
-                  </span>
-                )}
-              </div>
-
-              <div className="flex-1 overflow-hidden mb-4 mt-2">
-                <p className="text-[#6b6b6b] text-[15px] line-clamp-3 break-all">
-                  {post.content || (
-                    <span className="text-transparent">
-                      empty space to force height
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <div className="mt-auto flex justify-between items-end gap-2 mb-4">
-                <div className="flex items-start gap-2 text-[#6b6b6b]">
-                  <Calendar className="w-4 h-4 mt-0.5 shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="text-sm">
-                      {post.status === "draft"
-                        ? "Draft saved "
-                        : "Scheduled for "}
-                      {post.scheduledDate
-                        ? format(new Date(post.scheduledDate), "MMM d, yyyy")
-                        : "No date"}
-                    </span>
-                    {post.scheduledDate && (
-                      <span className="text-sm">
-                        {format(new Date(post.scheduledDate), "h:mm a")}
+                  <div className="shrink-0 ml-2">
+                    {post.status === "scheduled" && (
+                      <span className="bg-[#f0fdce] text-[#4a5c0a] border border-[#d4f24a]/40 px-2.5 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest shadow-sm">
+                        Scheduled
+                      </span>
+                    )}
+                    {post.status === "draft" && (
+                      <span className="bg-amber-50 text-amber-700 border border-amber-200/50 px-2.5 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest shadow-sm">
+                        Draft
+                      </span>
+                    )}
+                    {post.status === "published" && (
+                      <span className="bg-[#f5f5f5] text-[#333333] border border-[#e0e0e0] px-2.5 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest shadow-sm">
+                        Published
                       </span>
                     )}
                   </div>
                 </div>
-              </div>
 
-              <div className="flex justify-between items-center gap-2 pt-4 border-t border-[#e0dbd3]">
-                <Link
-                  href={`/edit/${post._id}`}
-                  passHref
-                  className="flex-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Button
-                    variant="outline"
-                    className="w-full h-10 text-[#0f0f0f] font-medium border-[#e0dbd3]"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  className="h-10 w-12 px-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0 flex items-center justify-center border-[#e0dbd3]"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(post._id);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                {/* Content */}
+                <div className="flex-1 mb-6 relative">
+                  <p className="text-[#3b3b3b] text-[15px] font-medium leading-relaxed line-clamp-4 wrap-break-word whitespace-pre-wrap">
+                    {post.content || (
+                      <span className="text-[#a0a0a0] italic font-normal">
+                        No text content for this post...
+                      </span>
+                    )}
+                  </p>
+                  {/* Subtle fade-out at bottom if text is long */}
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-white to-transparent pointer-events-none" />
+                </div>
+
+                {/* Footer details */}
+                <div className="mt-auto pt-4 border-t border-[#f0ebe1] flex items-center justify-between">
+                  {/* Date & Time */}
+                  <div className="flex items-center gap-2 text-[#6b6b6b] bg-[#faf8f4] px-3 py-1.5 rounded-xl border border-[#e0dbd3]/50">
+                    <Calendar className="w-4 h-4 text-[#8c8c8c]" />
+                    <span className="text-[13px] font-semibold tracking-tight">
+                      {post.scheduledDate
+                        ? format(new Date(post.scheduledDate), "MMM d, h:mm a")
+                        : "Unscheduled"}
+                    </span>
+                  </div>
+
+                  {/* Actions (visible on hover) */}
+                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                    <Link
+                      href={`/edit/${post._id}`}
+                      passHref
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-2 rounded-xl text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#f0ebe1] transition-colors"
+                      title="Edit Post"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(post._id);
+                      }}
+                      className="p-2 rounded-xl text-[#6b6b6b] hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Delete Post"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
