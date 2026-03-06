@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { PostForm, PostFormData } from "@/components/create/PostForm";
 import { LivePreview } from "@/components/create/LivePreview";
 import { useMutation } from "convex/react";
@@ -12,7 +12,7 @@ import { api } from "../../../convex/_generated/api";
 import { useWorkspace } from "@/components/providers/WorkspaceContext";
 import { toast } from "sonner";
 
-export default function CreatePostPage() {
+function CreatePostContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const createPost = useMutation(api.posts.createPost);
@@ -148,5 +148,19 @@ export default function CreatePostPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function CreatePostPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-[#f7f4ef]">
+          <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <CreatePostContent />
+    </Suspense>
   );
 }

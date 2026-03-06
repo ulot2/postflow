@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WorkspaceSettings } from "@/components/settings/WorkspaceSettings";
 import { AccountSettings } from "@/components/settings/AccountSettings";
@@ -19,7 +19,7 @@ const tabs = [
 
 type TabId = "workspace" | "team" | "account" | "accounts";
 
-export default function SettingsPage() {
+function SettingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -28,6 +28,8 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("workspace");
 
   const [prevTabParam, setPrevTabParam] = useState(tabParam);
+
+  // Use useEffect or simply a conditional check here
   if (tabParam !== prevTabParam) {
     setPrevTabParam(tabParam);
     if (
@@ -93,5 +95,19 @@ export default function SettingsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-[#f7f4ef]">
+          <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <SettingsContent />
+    </Suspense>
   );
 }
