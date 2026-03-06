@@ -12,6 +12,7 @@ import type * as accounts from "../accounts.js";
 import type * as actions_linkedin from "../actions/linkedin.js";
 import type * as crons from "../crons.js";
 import type * as files from "../files.js";
+import type * as ideas from "../ideas.js";
 import type * as posts from "../posts.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   "actions/linkedin": typeof actions_linkedin;
   crons: typeof crons;
   files: typeof files;
+  ideas: typeof ideas;
   posts: typeof posts;
   seed: typeof seed;
   users: typeof users;

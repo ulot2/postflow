@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Calendar, LayoutDashboard, Settings } from "lucide-react";
+import {
+  FileText,
+  Calendar,
+  LayoutDashboard,
+  Settings,
+  Lightbulb,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SignedIn } from "@clerk/nextjs";
 import { CustomUserButton } from "./CustomUserButton";
@@ -9,11 +15,18 @@ import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { useWorkspaceAccounts } from "@/lib/useWorkspaceAccounts";
 import { useWorkspace } from "../providers/WorkspaceContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { activeWorkspace } = useWorkspace();
   const { accounts } = useWorkspaceAccounts(activeWorkspace?._id);
+  const ideas = useQuery(
+    api.ideas.getIdeas,
+    activeWorkspace ? { workspaceId: activeWorkspace._id } : "skip",
+  );
+  const ideasCount = ideas?.length ?? 0;
 
   const navItems = [
     {
@@ -33,6 +46,13 @@ export function Sidebar() {
       href: "/dashboard",
       icon: LayoutDashboard,
       isActive: pathname === "/dashboard",
+    },
+    {
+      name: "Ideas",
+      href: "/ideas",
+      icon: Lightbulb,
+      isActive: pathname === "/ideas",
+      badge: ideasCount > 0 ? ideasCount : null,
     },
     {
       name: "Settings",
@@ -79,6 +99,7 @@ export function Sidebar() {
       <nav className="flex-1 px-3 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const badge = "badge" in item ? item.badge : null;
           return (
             <Link
               key={item.name}
@@ -91,6 +112,11 @@ export function Sidebar() {
             >
               <Icon className="w-[18px] h-[18px]" />
               {item.name}
+              {badge !== null && badge !== undefined && (
+                <span className="ml-auto px-2 py-0.5 rounded-full bg-[#d4f24a] text-[#0f0f0f] text-[10px] font-extrabold tabular-nums leading-none">
+                  {badge}
+                </span>
+              )}
             </Link>
           );
         })}

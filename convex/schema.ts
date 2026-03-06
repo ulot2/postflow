@@ -72,4 +72,15 @@ export default defineSchema({
     brandLogoUrl: v.optional(v.string()),
     brandLogoId: v.optional(v.id("_storage")),
   }).index("by_user", ["userId"]),
+
+  ideas: defineTable({
+    content: v.string(),
+    authorId: v.string(),
+    workspaceId: v.id("workspaces"),
+    tags: v.optional(v.array(v.string())),
+    pinned: v.optional(v.boolean()),
+    priority: v.optional(
+      v.union(v.literal("hot"), v.literal("maybe"), v.literal("someday")),
+    ),
+  }).index("by_workspace", ["workspaceId"]),
 });

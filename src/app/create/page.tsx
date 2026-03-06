@@ -7,19 +7,22 @@ import { useState } from "react";
 import { PostForm, PostFormData } from "@/components/create/PostForm";
 import { LivePreview } from "@/components/create/LivePreview";
 import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import { useWorkspace } from "@/components/providers/WorkspaceContext";
 import { toast } from "sonner";
 
 export default function CreatePostPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const createPost = useMutation(api.posts.createPost);
   const { activeWorkspace } = useWorkspace();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const prefillContent = searchParams.get("content") ?? "";
+
   const [formData, setFormData] = useState<PostFormData>({
-    content: "",
+    content: prefillContent,
     imageUrls: [],
     platforms: ["twitter"],
     scheduledDate: new Date().toISOString().split("T")[0],
