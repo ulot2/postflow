@@ -93,7 +93,7 @@ export function PostCard({
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 p-3 text-xs shadow-sm transition-all md:hover:z-50 md:hover:-translate-y-px md:hover:border-slate-300 md:hover:shadow-md touch-none",
+        "group relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 p-3 text-xs shadow-sm transition-all md:hover:z-50 md:hover:-translate-y-px md:hover:border-slate-300 md:hover:shadow-md",
         transform ? "z-50 opacity-90 cursor-grabbing" : "cursor-grab",
       )}
     >

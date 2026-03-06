@@ -116,10 +116,10 @@ export function ConnectedAccounts() {
             <Link2 className="w-5 h-5 text-[#0f0f0f]" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[#0f0f0f] font-syne">
+            <h2 className="text-[16px] sm:text-xl font-bold text-[#0f0f0f] font-syne">
               Connected Accounts
             </h2>
-            <p className="text-sm text-[#6b6b6b]">
+            <p className="text-[12px] sm:text-sm text-[#6b6b6b]">
               Connect social media profiles to schedule and publish posts.
             </p>
           </div>

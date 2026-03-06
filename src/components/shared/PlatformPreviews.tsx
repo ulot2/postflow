@@ -229,10 +229,10 @@ export function InstagramPreview({
       </div>
       <div className="p-3">
         <div className="flex gap-4 mb-2">
-          <Heart className="w-6 h-6 rounded-full hover:text-red-500 cursor-pointer transition-colors" />
-          <MessageCircle className="w-6 h-6 rounded-full hover:text-blue-500 cursor-pointer transition-colors" />
-          <Repeat2 className="w-6 h-6 rounded-full hover:text-green-500 cursor-pointer transition-colors" />
-          <Send className="w-6 h-6 rounded-full hover:text-blue-500 cursor-pointer transition-colors" />
+          <Heart className="w-6 h-6 hover:text-red-500 cursor-pointer transition-colors" />
+          <MessageCircle className="w-6 h-6 hover:text-blue-500 cursor-pointer transition-colors" />
+          <Send className="w-6 h-6 hover:text-blue-500 cursor-pointer transition-colors" />
+          <Bookmark className="w-6 h-6 ml-auto hover:text-blue-500 cursor-pointer transition-colors" />
         </div>
         <p className="text-sm text-[#0f0f0f]">
           <span className="font-bold mr-2">{handle}</span>

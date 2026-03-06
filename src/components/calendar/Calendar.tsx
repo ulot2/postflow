@@ -5,7 +5,6 @@ import {
   DragEndEvent,
   useDroppable,
   PointerSensor,
-  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -76,12 +75,6 @@ export function Calendar() {
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 5,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 8,
       },
     }),
   );

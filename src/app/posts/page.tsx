@@ -60,10 +60,10 @@ export default function PostsPage() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
         <header className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#0f0f0f] mb-1 font-syne">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0f0f0f] mb-1 font-syne">
               Posts
             </h1>
-            <p className="text-[#6b6b6b]">
+            <p className="text-[#6b6b6b] text-[12px] sm:text-sm">
               Manage all your content in one place
             </p>
           </div>
@@ -76,10 +76,10 @@ export default function PostsPage() {
           )}
         </header>
 
-        <div className="flex bg-white border border-[#e0dbd3] rounded-full p-1.5 w-fit mb-8 gap-1">
+        <div className="flex bg-white border border-[#e0dbd3] rounded-full p-1 w-fit max-w-full mb-8 gap-1 overflow-x-auto custom-scrollbar">
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-[12px] sm:text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filter === "all"
                 ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                 : "text-[#6b6b6b] hover:text-[#0f0f0f]"
@@ -89,7 +89,7 @@ export default function PostsPage() {
           </button>
           <button
             onClick={() => setFilter("draft")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-[12px] sm:text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filter === "draft"
                 ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                 : "text-[#6b6b6b] hover:text-[#0f0f0f]"
@@ -99,7 +99,7 @@ export default function PostsPage() {
           </button>
           <button
             onClick={() => setFilter("scheduled")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-[12px] sm:text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filter === "scheduled"
                 ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                 : "text-[#6b6b6b] hover:text-[#0f0f0f]"
@@ -109,7 +109,7 @@ export default function PostsPage() {
           </button>
           <button
             onClick={() => setFilter("published")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-[12px] sm:text-sm font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               filter === "published"
                 ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                 : "text-[#6b6b6b] hover:text-[#0f0f0f]"

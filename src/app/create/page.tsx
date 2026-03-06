@@ -81,32 +81,35 @@ function CreatePostContent() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-dvh overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
-        <header className="flex justify-between items-center mb-6 bg-white border border-[#e0dbd3] p-4 shrink-0 rounded-xl">
+        <header className="flex flex-row justify-between items-center mb-6 bg-white border border-[#e0dbd3] p-4 shrink-0 rounded-xl gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
               Create Post
             </h2>
-            <p className="text-sm text-[#6b6b6b]">
+            <p className="text-sm text-[#6b6b6b] hidden sm:block">
               Draft a new post and preview how it looks
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <Link href="/" passHref>
-              <Button variant="outline" className="shadow-sm border-[#e0dbd3]">
+              <Button
+                variant="outline"
+                className="shadow-sm border-[#e0dbd3] h-9 md:h-10 px-3 md:px-4 text-sm"
+              >
                 Cancel
               </Button>
             </Link>
           </div>
         </header>
 
-        {/* Side-by-side Form and Preview */}
-        <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
-          {/* Left Side: Form */}
-          <div className="w-full lg:w-[45%] flex flex-col h-full bg-white rounded-2xl shadow-sm border border-[#e0dbd3] p-6 overflow-y-auto custom-scrollbar relative">
+        {/* Stack on mobile, Side-by-side on desktop */}
+        <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0 overflow-y-auto lg:overflow-hidden">
+          {/* Top/Left Side: Form */}
+          <div className="w-full lg:w-[45%] flex flex-col lg:h-full shrink-0 lg:shrink bg-white rounded-2xl shadow-sm border border-[#e0dbd3] p-4 md:p-6 lg:overflow-y-auto custom-scrollbar relative">
             {isSubmitting && (
               <div className="absolute inset-0 bg-white/60 backdrop-blur-xs z-10 flex items-center justify-center rounded-2xl">
                 <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
@@ -119,8 +122,8 @@ function CreatePostContent() {
             />
           </div>
 
-          {/* Right Side: Preview */}
-          <div className="w-full lg:w-[55%] flex flex-col h-full bg-white/50 rounded-2xl shadow-inner border border-[#e0dbd3] p-6 overflow-y-auto custom-scrollbar relative">
+          {/* Bottom/Right Side: Preview */}
+          <div className="w-full lg:w-[55%] flex flex-col lg:h-full shrink-0 lg:shrink bg-white/50 rounded-2xl shadow-inner border border-[#e0dbd3] p-4 md:p-6 lg:overflow-y-auto custom-scrollbar relative">
             <h3 className="text-lg font-semibold text-[#0f0f0f] mb-4 shrink-0 px-2 flex items-center gap-2 font-syne">
               <svg
                 className="w-5 h-5 text-[#6b6b6b]"

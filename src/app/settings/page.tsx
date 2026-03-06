@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WorkspaceSettings } from "@/components/settings/WorkspaceSettings";
 import { AccountSettings } from "@/components/settings/AccountSettings";
@@ -61,7 +61,7 @@ function SettingsContent() {
           </p>
 
           {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-white rounded-xl border border-[#e0dbd3] mb-8">
+          <div className="flex gap-1 p-1 bg-white rounded-xl border border-[#e0dbd3] mb-8 overflow-x-auto custom-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -69,13 +69,13 @@ function SettingsContent() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[13px] font-semibold transition-all cursor-pointer ${
+                  className={`flex-1 min-w-fit flex items-center justify-center gap-1.5 px-3 md:px-4 py-2 rounded-xl text-[13px] font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     isActive
                       ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                       : "text-[#6b6b6b] hover:text-[#0f0f0f]"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   {tab.label}
                 </button>
               );

@@ -15,7 +15,7 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef]">
         <header className="flex justify-between items-center mb-8 bg-white border border-[#e0dbd3] p-4 rounded-xl">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#0f0f0f] font-syne">
               Content Calendar
             </h2>
             <p className="text-sm text-[#6b6b6b]">
