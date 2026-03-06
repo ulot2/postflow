@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { resolveUser, getWorkspaceRole, assertRole } from "./lib/roles";
 
 export const getIdeas = query({
   args: { workspaceId: v.id("workspaces") },
@@ -33,6 +34,13 @@ export const createIdea = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
+    // Enforce: only admin or editor can create ideas
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(ctx.db, args.workspaceId, user._id);
+      assertRole(role, "editor");
+    }
+
     return await ctx.db.insert("ideas", {
       content: args.content,
       authorId: identity.subject,
@@ -58,7 +66,18 @@ export const updateIdea = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Idea not found");
+
+    // Enforce: only admin or editor can update ideas
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 
@@ -78,7 +97,18 @@ export const togglePin = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Idea not found");
+
+    // Enforce: only admin or editor can pin/unpin ideas
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 
@@ -95,7 +125,18 @@ export const deleteIdea = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Idea not found");
+
+    // Enforce: only admin or editor can delete ideas
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 

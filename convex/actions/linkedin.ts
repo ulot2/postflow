@@ -148,6 +148,14 @@ export const publish = action({
         status: "published",
       });
 
+      // 4. Create a success notification for all workspace members
+      await ctx.runMutation(api.notifications.createSystemNotification, {
+        workspaceId: args.workspaceId,
+        type: "post_published",
+        title: "Post Published!",
+        body: `Your LinkedIn post has been published successfully.`,
+      });
+
       return { success: true };
     } catch (error) {
       console.error("Failed to publish to LinkedIn:", error);
@@ -156,6 +164,14 @@ export const publish = action({
       await ctx.runMutation(api.posts.updatePostStatus, {
         id: args.postId,
         status: "failed",
+      });
+
+      // Create a failure notification
+      await ctx.runMutation(api.notifications.createSystemNotification, {
+        workspaceId: args.workspaceId,
+        type: "post_failed",
+        title: "Post Failed",
+        body: `Your LinkedIn post failed to publish. Please try again.`,
       });
 
       throw error;

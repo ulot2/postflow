@@ -1,0 +1,141 @@
+# Team Collaboration & Notifications Implementation Plan
+
+This plan describes how we will implement Team Collaboration (shared access to workspaces with roles) and Notifications (in-app alerts for system and team events) in PostFlow.
+
+## Proposed Changes
+
+---
+
+### Backend: Database Schema Updates
+
+#### [MODIFY] [schema.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/schema.ts)
+
+We will add two new overarching tables to support these features:
+
+1.  **`workspaceMembers`**: To support multi-user teams, workspaces will no longer be tied to a single `userId` directly via the `workspaces` table itself. Instead, access is determined by membership.
+2.  **`notifications`**: To store user-directed system alerts or team events.
+
+```typescript
+// Add these new tables:
+workspaceMembers: defineTable({
+  workspaceId: v.id("workspaces"),
+  userId: v.id("users"),
+  role: v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer")),
+  joinedAt: v.number(),
+})
+  .index("by_workspace", ["workspaceId"])
+  .index("by_user", ["userId"])
+  .index("by_workspace_and_user", ["workspaceId", "userId"]),
+
+notifications: defineTable({
+  userId: v.id("users"), // The recipient
+  workspaceId: v.id("workspaces"), // Optional, if scoped to a workspace
+  type: v.union(
+    v.literal("post_published"),
+    v.literal("post_failed"),
+    v.literal("workspace_invite"),
+    v.literal("role_update")
+  ),
+  title: v.string(),
+  body: v.string(),
+  isRead: v.boolean(),
+  metadata: v.optional(v.any()), // e.g. { postId: "..." }
+  createdAt: v.number(),
+}).index("by_user", ["userId"]),
+```
+
+We will also conditionally make `userId` in `workspaces` optional, though we can keep it for now as the "creator" ID.
+
+---
+
+### Backend: API Updates
+
+#### [NEW] [members.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/members.ts)
+
+A new file to manage team operations.
+
+- `getMembers(workspaceId)`: lists all members in a workspace.
+- `inviteMember(email, role, workspaceId)`: Looks up a user by email, adds them to `workspaceMembers`, and triggers a `workspace_invite` notification.
+- `removeMember(memberId)`: Allows an admin to remove a member.
+- `updateRole(memberId, newRole)`: Upgrades/downgrades user access.
+
+#### [NEW] [notifications.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/notifications.ts)
+
+A new file for the notification system.
+-   `getNotifications()`: Query for the current user's unread and recent read notifications.
+-   `markAsRead(notificationId)`: Mutation to mark an alert as seen.
+-   `markAllAsRead()`: Bulk action.
+-   `registerPushToken(endpoint, p256dh, auth)`: Store the user's Web Push subscription.
+
+#### [NEW] [email.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/actions/email.ts)
+-   `sendInviteEmail`: A Convex Action using **Resend** (which has a generous free tier of 3,000 emails/month, much better than SendGrid's free tier for modern React apps). We will use `@react-email` to style the invite.
+
+#### [NEW] [push.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/actions/push.ts)
+-   `sendWebPush`: An action that uses the `web-push` library to send native browser notifications to online users (e.g., "Post Published Successfully!").
+
+#### [MODIFY] Convex Access Control ([posts.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/posts.ts), [ideas.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/ideas.ts), [accounts.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/accounts.ts), [workspaces.ts](file:///c:/Users/ADMIN/Documents/Projects/postflow/convex/workspaces.ts))
+
+Currently, many files verify access by checking `workspace.userId === user._id`.
+We will extract or build a helper to verify the user belongs to the `workspaceMembers` table instead, and potentially check roles (e.g. only `admin` or `editor` can `createPost`, while `viewer` can only read).
+
+- Modify `getWorkspaces`: Query `workspaceMembers` by `userId`, then map those IDs to fetch the actual `workspaces`.
+- Modify publishing actions (LinkedIn cron action) to create `notifications` on success/failure instead of failing silently.
+
+---
+
+### Frontend: Team Management UI
+
+#### [MODIFY] [page.tsx (Settings)](file:///c:/Users/ADMIN/Documents/Projects/postflow/src/app/settings/page.tsx)
+
+We will add a new Tab to the Settings view: "Team".
+
+#### [NEW] `TeamMembers.tsx` (in `src/components/settings/TeamMembers.tsx`)
+
+- A data table showing all members of the current active workspace.
+- Columns: Avatar/Name, Email, Role, Joined Date, Actions.
+- Actions: dropdown to change role (Admin only) or "Remove" (Admin only).
+
+#### [NEW] `InviteMemberModal.tsx`
+
+- A modal triggered by an "Invite Member" button.
+- An input for Email Address, and a Select for Role dropdown.
+
+---
+
+### Frontend: Notifications UI
+
+#### [NEW] `NotificationBell.tsx`
+
+-   A bell icon component placed in the `Sidebar` or top header.
+-   Shows a small red badge if unread notifications exist (`!isRead`).
+
+#### [NEW] `NotificationPopover.tsx`
+
+-   When clicking the bell, a Popover/Dropdown appears showing a scrollable list of recent notifications.
+-   Clicking a notification marks it as read and potentially routes the user (e.g., clicking a "Post Failed" routes them to the edit page for that post).
+
+#### [NEW] Web Push Integration (`public/sw.js` & `usePushManager.ts`)
+-   We will register a Service Worker (`sw.js`) to listen for incoming push events.
+-   We'll create a hook (`usePushManager.ts`) to request the user's browser notification permission (using the native Notification API) and send the active push subscription to our `registerPushToken` Convex mutation.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Data Migration Alert**: Since we are changing workspaces from purely single-owner (`workspace.userId = user._id`) to a multi-member model (using the `workspaceMembers` table), existing users in the database will suddenly lose access to their workspaces unless we migrate them.
+>
+> We will need to write a small migration script (or manual script) that loops through all `workspaces` and inserts an "admin" record into `workspaceMembers` for the creator.
+
+> [!NOTE]
+> Based on your request, we will use **Resend** for email delivery (it's the modern standard for Next.js and has an excellent free tier compared to SendGrid) combined with React Email for styling. 
+> We will also implement the **Web Push API** so you get native browser notifications (the ones that slide in from the OS) when a post publishes or fails.
+
+## Verification Plan
+
+### Manual Verification
+
+1.  **Migration check**: Ensure the creator of a workspace is still treated as an Admin.
+2.  **Team Invites**: Create a dummy account, invite their email to the workspace, log in as them, and verify they see the shared workspace in their switcher.
+3.  **Permissions Constraint**: Verify that a user assigned the "Viewer" role cannot trigger the `createPost` or `updatePost` mutations.
+4.  **Notifications Pipeline**: Schedule a post. Verify a success notification appears in the bell dropdown exactly one minute after execution time.

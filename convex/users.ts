@@ -75,6 +75,14 @@ export const completeOnboarding = mutation({
       brandLogoUrl: logoUrl,
     });
 
+    // Auto-add creator as admin member
+    await ctx.db.insert("workspaceMembers", {
+      workspaceId,
+      userId: user._id,
+      role: "admin",
+      joinedAt: Date.now(),
+    });
+
     return workspaceId;
   },
 });

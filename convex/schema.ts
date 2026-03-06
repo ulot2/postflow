@@ -83,4 +83,30 @@ export default defineSchema({
       v.union(v.literal("hot"), v.literal("maybe"), v.literal("someday")),
     ),
   }).index("by_workspace", ["workspaceId"]),
+
+  workspaceMembers: defineTable({
+    workspaceId: v.id("workspaces"),
+    userId: v.id("users"),
+    role: v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer")),
+    joinedAt: v.number(),
+  })
+    .index("by_workspace", ["workspaceId"])
+    .index("by_user", ["userId"])
+    .index("by_workspace_and_user", ["workspaceId", "userId"]),
+
+  notifications: defineTable({
+    userId: v.id("users"),
+    workspaceId: v.optional(v.id("workspaces")),
+    type: v.union(
+      v.literal("post_published"),
+      v.literal("post_failed"),
+      v.literal("workspace_invite"),
+      v.literal("role_update"),
+    ),
+    title: v.string(),
+    body: v.string(),
+    isRead: v.boolean(),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

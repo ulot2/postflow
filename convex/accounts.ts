@@ -53,9 +53,22 @@ export const connectAccount = mutation({
 
     if (!user) throw new Error("User not found");
 
-    // Verify workspace belongs to user
+    // Verify workspace access via membership or legacy owner
     const workspace = await ctx.db.get(args.workspaceId);
-    if (!workspace || workspace.userId !== user._id) {
+    if (!workspace) throw new Error("Workspace not found");
+
+    const membership = await ctx.db
+      .query("workspaceMembers")
+      .withIndex("by_workspace_and_user", (q) =>
+        q.eq("workspaceId", args.workspaceId).eq("userId", user._id),
+      )
+      .unique();
+
+    // Allow admin/editor members or legacy owner
+    if (
+      (!membership || membership.role === "viewer") &&
+      workspace.userId !== user._id
+    ) {
       throw new Error("Unauthorized workspace access");
     }
 

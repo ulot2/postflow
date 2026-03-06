@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { SignedIn } from "@clerk/nextjs";
 import { CustomUserButton } from "./CustomUserButton";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { NotificationBell } from "../notifications/NotificationBell";
 import { useWorkspaceAccounts } from "@/lib/useWorkspaceAccounts";
 import { useWorkspace } from "../providers/WorkspaceContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -20,7 +21,7 @@ import { api } from "../../../convex/_generated/api";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { activeWorkspace } = useWorkspace();
+  const { activeWorkspace, activeRole } = useWorkspace();
   const { accounts } = useWorkspaceAccounts(activeWorkspace?._id);
   const ideas = useQuery(
     api.ideas.getIdeas,
@@ -54,12 +55,17 @@ export function Sidebar() {
       isActive: pathname === "/ideas",
       badge: ideasCount > 0 ? ideasCount : null,
     },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Settings,
-      isActive: pathname === "/settings",
-    },
+    // Only admins can access settings
+    ...(activeRole === "admin"
+      ? [
+          {
+            name: "Settings",
+            href: "/settings",
+            icon: Settings,
+            isActive: pathname === "/settings",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -167,8 +173,11 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* User Section */}
-      <div className="px-4 mt-auto">
+      {/* Notifications & User Section */}
+      <div className="px-4 mt-auto space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <NotificationBell />
+        </div>
         <SignedIn>
           <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-white/8 bg-white/4">
             <CustomUserButton />

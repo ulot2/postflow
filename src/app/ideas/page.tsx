@@ -16,7 +16,8 @@ type Priority = "hot" | "maybe" | "someday" | undefined;
 type SortOrder = "newest" | "oldest";
 
 export default function IdeasPage() {
-  const { activeWorkspace } = useWorkspace();
+  const { activeWorkspace, activeRole } = useWorkspace();
+  const canEdit = activeRole === "admin" || activeRole === "editor";
   const ideas = useQuery(
     api.ideas.getIdeas,
     activeWorkspace ? { workspaceId: activeWorkspace._id } : "skip",
@@ -154,10 +155,12 @@ export default function IdeasPage() {
           </div>
         </header>
 
-        {/* Quick Input */}
-        <div className="mb-6">
-          <IdeaInput onSubmit={handleCreate} />
-        </div>
+        {/* Quick Input — only for editors/admins */}
+        {canEdit && (
+          <div className="mb-6">
+            <IdeaInput onSubmit={handleCreate} />
+          </div>
+        )}
 
         {/* Filters */}
         {ideas.length > 0 && (
@@ -188,10 +191,10 @@ export default function IdeasPage() {
                 tags={idea.tags}
                 pinned={idea.pinned}
                 priority={idea.priority}
-                onDelete={handleDelete}
-                onUpdate={handleUpdate}
-                onTogglePin={handleTogglePin}
-                onUpdatePriority={handleUpdatePriority}
+                onDelete={canEdit ? handleDelete : undefined}
+                onUpdate={canEdit ? handleUpdate : undefined}
+                onTogglePin={canEdit ? handleTogglePin : undefined}
+                onUpdatePriority={canEdit ? handleUpdatePriority : undefined}
               />
             ))}
           </div>

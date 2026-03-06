@@ -4,8 +4,11 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/calendar/Calendar";
 import Link from "next/link";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 export default function Home() {
+  const { activeRole } = useWorkspace();
+  const canEdit = activeRole === "admin" || activeRole === "editor";
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
@@ -21,11 +24,13 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/create" passHref>
-              <Button className="bg-[#0f0f0f] text-[#d4f24a] hover:opacity-90 font-syne font-bold shadow-md rounded-xl px-5">
-                + New Post
-              </Button>
-            </Link>
+            {canEdit && (
+              <Link href="/create" passHref>
+                <Button className="bg-[#0f0f0f] text-[#d4f24a] hover:opacity-90 font-syne font-bold shadow-md rounded-xl px-5">
+                  + New Post
+                </Button>
+              </Link>
+            )}
           </div>
         </header>
 

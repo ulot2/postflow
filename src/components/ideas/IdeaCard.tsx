@@ -24,10 +24,10 @@ interface IdeaCardProps {
   tags?: string[];
   pinned?: boolean;
   priority?: Priority;
-  onDelete: (id: Id<"ideas">) => void;
-  onUpdate: (id: Id<"ideas">, content: string) => void;
-  onTogglePin: (id: Id<"ideas">) => void;
-  onUpdatePriority: (id: Id<"ideas">, priority: Priority) => void;
+  onDelete?: (id: Id<"ideas">) => void;
+  onUpdate?: (id: Id<"ideas">, content: string) => void;
+  onTogglePin?: (id: Id<"ideas">) => void;
+  onUpdatePriority?: (id: Id<"ideas">, priority: Priority) => void;
 }
 
 export function IdeaCard({
@@ -46,6 +46,7 @@ export function IdeaCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const canEdit = !!(onUpdate && onDelete);
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
@@ -58,6 +59,7 @@ export function IdeaCard({
   }, [isEditing]);
 
   const handleSaveEdit = () => {
+    if (!onUpdate) return;
     const trimmed = editContent.trim();
     if (trimmed && trimmed !== content) {
       onUpdate(id, trimmed);
@@ -81,6 +83,7 @@ export function IdeaCard({
   };
 
   const cyclePriority = () => {
+    if (!onUpdatePriority) return;
     const currentIdx = PRIORITY_CYCLE.indexOf(priority);
     const nextIdx = (currentIdx + 1) % PRIORITY_CYCLE.length;
     onUpdatePriority(id, PRIORITY_CYCLE[nextIdx]);
@@ -94,16 +97,18 @@ export function IdeaCard({
     >
       {/* Top right actions */}
       <div className="absolute top-3 right-3 flex items-center gap-1.5">
-        <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-          <ConfirmDeletePopover onConfirm={() => onDelete(id)}>
-            <button
-              className="p-1.5 rounded-lg text-[#a09a90] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer bg-white/50 backdrop-blur-sm"
-              title="Delete Idea"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </ConfirmDeletePopover>
-        </div>
+        {onDelete && (
+          <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+            <ConfirmDeletePopover onConfirm={() => onDelete(id)}>
+              <button
+                className="p-1.5 rounded-lg text-[#a09a90] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer bg-white/50 backdrop-blur-sm"
+                title="Delete Idea"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </ConfirmDeletePopover>
+          </div>
+        )}
 
         {/* Pin indicator */}
         {pinned && (
@@ -115,22 +120,32 @@ export function IdeaCard({
 
       {/* Priority dot + Content */}
       <div className="flex gap-3 mb-3">
-        {/* Priority indicator — clickable to cycle */}
-        <button
-          onClick={cyclePriority}
-          title={priority ? PRIORITY_CONFIG[priority].label : "Set priority"}
-          className="mt-1 shrink-0 cursor-pointer"
-        >
-          <div
-            className={`w-3 h-3 rounded-full transition-all duration-200 ${
-              priority
-                ? PRIORITY_CONFIG[priority].color
-                : "bg-[#e0dbd3] hover:bg-[#c5bfb5]"
-            }`}
-          />
-        </button>
+        {/* Priority indicator — clickable to cycle (only if editable) */}
+        {onUpdatePriority ? (
+          <button
+            onClick={cyclePriority}
+            title={priority ? PRIORITY_CONFIG[priority].label : "Set priority"}
+            className="mt-1 shrink-0 cursor-pointer"
+          >
+            <div
+              className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                priority
+                  ? PRIORITY_CONFIG[priority].color
+                  : "bg-[#e0dbd3] hover:bg-[#c5bfb5]"
+              }`}
+            />
+          </button>
+        ) : (
+          <div className="mt-1 shrink-0">
+            <div
+              className={`w-3 h-3 rounded-full ${
+                priority ? PRIORITY_CONFIG[priority].color : "bg-[#e0dbd3]"
+              }`}
+            />
+          </div>
+        )}
 
-        {/* Content — double click to edit */}
+        {/* Content — double click to edit (only if editable) */}
         <div className="flex-1 min-w-0">
           {isEditing ? (
             <div className="flex flex-col gap-2">
@@ -165,12 +180,16 @@ export function IdeaCard({
             </div>
           ) : (
             <p
-              onDoubleClick={() => {
-                setEditContent(content);
-                setIsEditing(true);
-              }}
-              className="text-[15px] text-[#2b2b2b] font-medium leading-relaxed whitespace-pre-wrap wrap-break-word cursor-text select-none"
-              title="Double-click to edit"
+              onDoubleClick={
+                canEdit
+                  ? () => {
+                      setEditContent(content);
+                      setIsEditing(true);
+                    }
+                  : undefined
+              }
+              className={`text-[15px] text-[#2b2b2b] font-medium leading-relaxed whitespace-pre-wrap wrap-break-word ${canEdit ? "cursor-text select-none" : ""}`}
+              title={canEdit ? "Double-click to edit" : undefined}
             >
               {content}
             </p>
@@ -198,28 +217,32 @@ export function IdeaCard({
           {timeAgo}
         </span>
 
-        <div className="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-          {/* Pin toggle */}
-          <button
-            onClick={() => onTogglePin(id)}
-            className={`p-2 rounded-xl transition-colors cursor-pointer ${
-              pinned
-                ? "text-[#7a8a2a] bg-[#f0fdce]"
-                : "text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#f0ebe1]"
-            }`}
-            title={pinned ? "Unpin" : "Pin to top"}
-          >
-            <Pin className={`w-4 h-4 ${pinned ? "fill-current" : ""}`} />
-          </button>
+        {canEdit && (
+          <div className="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+            {/* Pin toggle */}
+            {onTogglePin && (
+              <button
+                onClick={() => onTogglePin(id)}
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                  pinned
+                    ? "text-[#7a8a2a] bg-[#f0fdce]"
+                    : "text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#f0ebe1]"
+                }`}
+                title={pinned ? "Unpin" : "Pin to top"}
+              >
+                <Pin className={`w-4 h-4 ${pinned ? "fill-current" : ""}`} />
+              </button>
+            )}
 
-          <Link
-            href={`/create?content=${encodeURIComponent(content)}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold text-[#0f0f0f] bg-[#f0fdce] border border-[#d4f24a]/30 hover:bg-[#d4f24a] transition-colors duration-200"
-          >
-            Create Post
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+            <Link
+              href={`/create?content=${encodeURIComponent(content)}`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold text-[#0f0f0f] bg-[#f0fdce] border border-[#d4f24a]/30 hover:bg-[#d4f24a] transition-colors duration-200"
+            >
+              Create Post
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

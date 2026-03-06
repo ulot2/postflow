@@ -16,8 +16,10 @@ export default function CreatePostPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const createPost = useMutation(api.posts.createPost);
-  const { activeWorkspace } = useWorkspace();
+  const { activeWorkspace, activeRole } = useWorkspace();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const canEdit = activeRole === "admin" || activeRole === "editor";
 
   const prefillContent = searchParams.get("content") ?? "";
 
@@ -28,6 +30,12 @@ export default function CreatePostPage() {
     scheduledDate: new Date().toISOString().split("T")[0],
     scheduledTime: "12:00",
   });
+
+  // Redirect viewers away (after all hooks)
+  if (!canEdit && activeRole !== null) {
+    router.push("/");
+    return null;
+  }
 
   const handleSubmit = async (status: "draft" | "scheduled") => {
     if (!activeWorkspace) return;

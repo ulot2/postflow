@@ -20,6 +20,7 @@ type Workspace = {
   userId: Id<"users">;
   brandLogoUrl?: string;
   brandLogoId?: Id<"_storage">;
+  role?: "admin" | "editor" | "viewer";
 };
 
 type WorkspaceContextType = {
@@ -27,6 +28,8 @@ type WorkspaceContextType = {
   activeWorkspace: Workspace | null;
   setActiveWorkspace: (id: Id<"workspaces">) => void;
   isLoading: boolean;
+  /** Current user's role in the active workspace */
+  activeRole: "admin" | "editor" | "viewer" | null;
 };
 
 const WorkspaceContext = createContext<WorkspaceContextType>({
@@ -34,6 +37,7 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
   activeWorkspace: null,
   setActiveWorkspace: () => {},
   isLoading: true,
+  activeRole: null,
 });
 
 const STORAGE_KEY = "postflow_active_workspace";
@@ -66,6 +70,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const activeWorkspace =
     (workspaces ?? []).find((ws) => ws._id === activeId) ?? null;
 
+  const activeRole = (activeWorkspace as Workspace | null)?.role ?? null;
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -73,6 +79,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         activeWorkspace: activeWorkspace as Workspace | null,
         setActiveWorkspace,
         isLoading: workspaces === undefined,
+        activeRole,
       }}
     >
       {children}

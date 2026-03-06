@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { api } from "./_generated/api";
 import { v } from "convex/values";
+import { resolveUser, getWorkspaceRole, assertRole } from "./lib/roles";
 
 export const getPosts = query({
   args: { workspaceId: v.id("workspaces") },
@@ -35,7 +36,16 @@ export const getPost = query({
     if (!identity) return null;
 
     const post = await ctx.db.get(args.id);
-    if (!post || post.authorId !== identity.subject) return null;
+    if (!post) return null;
+
+    // Check workspace access via membership or legacy authorId
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(ctx.db, post.workspaceId, user._id);
+      if (!role && post.authorId !== identity.subject) return null;
+    } else if (post.authorId !== identity.subject) {
+      return null;
+    }
 
     let imageUrls = post.imageUrls;
     if (post.imageIds && post.imageIds.length > 0) {
@@ -109,6 +119,13 @@ export const createPost = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
+    // Enforce: only admin or editor can create posts
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(ctx.db, args.workspaceId, user._id);
+      assertRole(role, "editor");
+    }
+
     return await ctx.db.insert("posts", {
       content: args.content,
       platform: args.platform,
@@ -142,7 +159,18 @@ export const updatePost = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Post not found");
+
+    // Enforce: only admin or editor can update posts
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 
@@ -166,7 +194,18 @@ export const updateSchedule = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Post not found");
+
+    // Enforce: only admin or editor can reschedule
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 
@@ -184,7 +223,18 @@ export const deletePost = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const existing = await ctx.db.get(args.id);
-    if (!existing || existing.authorId !== identity.subject) {
+    if (!existing) throw new Error("Post not found");
+
+    // Enforce: only admin or editor can delete posts
+    const user = await resolveUser(ctx.db, identity.subject);
+    if (user) {
+      const role = await getWorkspaceRole(
+        ctx.db,
+        existing.workspaceId,
+        user._id,
+      );
+      assertRole(role, "editor");
+    } else if (existing.authorId !== identity.subject) {
       throw new Error("Unauthorized");
     }
 

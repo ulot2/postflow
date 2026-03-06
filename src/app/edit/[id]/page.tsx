@@ -12,12 +12,22 @@ import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 export default function EditPostPage() {
+  const router = useRouter();
   const params = useParams();
   const postId = params.id as Id<"posts">;
 
+  const { activeRole } = useWorkspace();
   const post = useQuery(api.posts.getPost, { id: postId });
+  const canEdit = activeRole === "admin" || activeRole === "editor";
+
+  // Redirect viewers away
+  if (!canEdit && activeRole !== null) {
+    router.push("/dashboard");
+    return null;
+  }
 
   if (post === undefined) {
     return (

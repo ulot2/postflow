@@ -5,33 +5,44 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { WorkspaceSettings } from "@/components/settings/WorkspaceSettings";
 import { AccountSettings } from "@/components/settings/AccountSettings";
 import { ConnectedAccounts } from "@/components/settings/ConnectedAccounts";
-import { Briefcase, User, Link2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { TeamMembers } from "@/components/settings/TeamMembers";
+import { Briefcase, User, Link2, Users } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useWorkspace } from "@/components/providers/WorkspaceContext";
 
 const tabs = [
   { id: "workspace" as const, label: "Workspace", icon: Briefcase },
+  { id: "team" as const, label: "Team", icon: Users },
   { id: "account" as const, label: "Account", icon: User },
   { id: "accounts" as const, label: "Connected Accounts", icon: Link2 },
 ];
 
+type TabId = "workspace" | "team" | "account" | "accounts";
+
 export default function SettingsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
+  const { activeRole } = useWorkspace();
 
-  const [activeTab, setActiveTab] = useState<
-    "workspace" | "account" | "accounts"
-  >("workspace");
+  const [activeTab, setActiveTab] = useState<TabId>("workspace");
 
   const [prevTabParam, setPrevTabParam] = useState(tabParam);
   if (tabParam !== prevTabParam) {
     setPrevTabParam(tabParam);
     if (
-      tabParam === "accounts" ||
-      tabParam === "account" ||
-      tabParam === "workspace"
+      tabParam &&
+      tabs.some((t) => t.id === tabParam) &&
+      tabParam !== activeTab
     ) {
-      setActiveTab(tabParam);
+      setActiveTab(tabParam as TabId);
     }
+  }
+
+  // Redirect non-admins away from settings entirely
+  if (activeRole !== "admin" && activeRole !== null) {
+    router.push("/dashboard");
+    return null;
   }
 
   return (
@@ -72,6 +83,8 @@ export default function SettingsPage() {
           {/* Tab Content */}
           {activeTab === "workspace" ? (
             <WorkspaceSettings />
+          ) : activeTab === "team" ? (
+            <TeamMembers />
           ) : activeTab === "accounts" ? (
             <ConnectedAccounts />
           ) : (

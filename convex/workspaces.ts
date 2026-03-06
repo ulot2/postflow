@@ -15,21 +15,43 @@ export const getUserWorkspaces = query({
 
     if (!user) return [];
 
-    const workspaces = await ctx.db
+    // Get workspace IDs from membership table
+    const memberships = await ctx.db
+      .query("workspaceMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    // Also still fetch by legacy userId field for backwards compatibility
+    // (in case migration hasn't run yet)
+    const legacyWorkspaces = await ctx.db
       .query("workspaces")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
 
-    // Resolve logo URLs
+    // Build a de-duped set of workspace IDs
+    const memberWorkspaceIds = memberships.map((m) => m.workspaceId);
+    const legacyIds = legacyWorkspaces.map((ws) => ws._id);
+    const allIds = [...new Set([...memberWorkspaceIds, ...legacyIds])];
+
+    // Fetch all workspaces by their proper typed IDs
+    const workspaces = await Promise.all(allIds.map((id) => ctx.db.get(id)));
+
+    // Resolve logo URLs & attach role
     return await Promise.all(
-      workspaces.map(async (ws) => {
-        let brandLogoUrl = ws.brandLogoUrl;
-        if (ws.brandLogoId) {
-          brandLogoUrl =
-            (await ctx.storage.getUrl(ws.brandLogoId)) ?? undefined;
-        }
-        return { ...ws, brandLogoUrl };
-      }),
+      workspaces
+        .filter((ws): ws is NonNullable<typeof ws> => ws !== null)
+        .map(async (ws) => {
+          let brandLogoUrl = ws.brandLogoUrl;
+          if (ws.brandLogoId) {
+            brandLogoUrl =
+              (await ctx.storage.getUrl(ws.brandLogoId)) ?? undefined;
+          }
+          // Find role from membership (default to admin for legacy owner)
+          const membership = memberships.find((m) => m.workspaceId === ws._id);
+          const role =
+            membership?.role ?? (ws.userId === user._id ? "admin" : "viewer");
+          return { ...ws, brandLogoUrl, role };
+        }),
     );
   },
 });
@@ -43,13 +65,23 @@ export const getWorkspace = query({
     const workspace = await ctx.db.get(args.id);
     if (!workspace) return null;
 
-    // Verify ownership
+    // Verify access via membership
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
       .unique();
 
-    if (!user || workspace.userId !== user._id) return null;
+    if (!user) return null;
+
+    // Check membership or legacy owner
+    const membership = await ctx.db
+      .query("workspaceMembers")
+      .withIndex("by_workspace_and_user", (q) =>
+        q.eq("workspaceId", args.id).eq("userId", user._id),
+      )
+      .unique();
+
+    if (!membership && workspace.userId !== user._id) return null;
 
     // Resolve logo URL
     let brandLogoUrl = workspace.brandLogoUrl;
@@ -58,7 +90,8 @@ export const getWorkspace = query({
         (await ctx.storage.getUrl(workspace.brandLogoId)) ?? undefined;
     }
 
-    return { ...workspace, brandLogoUrl };
+    const role = membership?.role ?? "admin";
+    return { ...workspace, brandLogoUrl, role };
   },
 });
 
@@ -99,6 +132,14 @@ export const createWorkspace = mutation({
       brandLogoUrl: logoUrl,
     });
 
+    // Auto-add creator as admin member
+    await ctx.db.insert("workspaceMembers", {
+      workspaceId,
+      userId: user._id,
+      role: "admin",
+      joinedAt: Date.now(),
+    });
+
     return workspaceId;
   },
 });
@@ -121,9 +162,23 @@ export const updateWorkspace = mutation({
       .unique();
     if (!user) throw new Error("User not found");
 
+    // Check membership — only admin can update workspace settings
+    const membership = await ctx.db
+      .query("workspaceMembers")
+      .withIndex("by_workspace_and_user", (q) =>
+        q.eq("workspaceId", args.id).eq("userId", user._id),
+      )
+      .unique();
+
     const workspace = await ctx.db.get(args.id);
-    if (!workspace || workspace.userId !== user._id) {
-      throw new Error("Workspace not found or access denied");
+    if (!workspace) throw new Error("Workspace not found");
+
+    // Allow if admin member or legacy owner
+    if (
+      (!membership || membership.role !== "admin") &&
+      workspace.userId !== user._id
+    ) {
+      throw new Error("Only admins can update workspace settings");
     }
 
     const patch: Record<string, unknown> = {};

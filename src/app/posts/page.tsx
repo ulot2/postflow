@@ -23,7 +23,8 @@ import { toast } from "sonner";
 type FilterStatus = "all" | "draft" | "scheduled" | "published";
 
 export default function PostsPage() {
-  const { activeWorkspace } = useWorkspace();
+  const { activeWorkspace, activeRole } = useWorkspace();
+  const canEdit = activeRole === "admin" || activeRole === "editor";
   const posts = useQuery(
     api.posts.getPosts,
     activeWorkspace ? { workspaceId: activeWorkspace._id } : "skip",
@@ -66,11 +67,13 @@ export default function PostsPage() {
               Manage all your content in one place
             </p>
           </div>
-          <Link href="/create" passHref>
-            <Button className="bg-[#0f0f0f] text-[#d4f24a] hover:opacity-90 font-syne font-bold px-6 py-5 rounded-xl shadow-md">
-              Create New Post
-            </Button>
-          </Link>
+          {canEdit && (
+            <Link href="/create" passHref>
+              <Button className="bg-[#0f0f0f] text-[#d4f24a] hover:opacity-90 font-syne font-bold px-6 py-5 rounded-xl shadow-md">
+                Create New Post
+              </Button>
+            </Link>
+          )}
         </header>
 
         <div className="flex bg-white border border-[#e0dbd3] rounded-full p-1.5 w-fit mb-8 gap-1">
@@ -224,33 +227,35 @@ export default function PostsPage() {
                     </span>
                   </div>
 
-                  {/* Actions (visible on hover) */}
-                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                    <Link
-                      href={`/edit/${post._id}`}
-                      passHref
-                      onClick={(e) => e.stopPropagation()}
-                      className="p-2 rounded-xl text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#f0ebe1] transition-colors"
-                      title="Edit Post"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Link>
-                    <ConfirmDeletePopover
-                      onConfirm={() => {
-                        handleDelete(post._id);
-                      }}
-                    >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        className="p-2 rounded-xl text-[#6b6b6b] hover:text-red-600 hover:bg-red-50 transition-colors"
-                        title="Delete Post"
+                  {/* Actions (visible on hover, only for editors/admins) */}
+                  {canEdit && (
+                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                      <Link
+                        href={`/edit/${post._id}`}
+                        passHref
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-xl text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#f0ebe1] transition-colors"
+                        title="Edit Post"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </ConfirmDeletePopover>
-                  </div>
+                        <Edit className="w-4 h-4" />
+                      </Link>
+                      <ConfirmDeletePopover
+                        onConfirm={() => {
+                          handleDelete(post._id);
+                        }}
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="p-2 rounded-xl text-[#6b6b6b] hover:text-red-600 hover:bg-red-50 transition-colors"
+                          title="Delete Post"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </ConfirmDeletePopover>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
