@@ -46,7 +46,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f7f4ef]">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#f7f4ef]">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-8 py-10">

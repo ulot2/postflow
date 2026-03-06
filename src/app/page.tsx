@@ -10,7 +10,7 @@ export default function Home() {
   const { activeRole } = useWorkspace();
   const canEdit = activeRole === "admin" || activeRole === "editor";
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef]">
         <header className="flex justify-between items-center mb-8 bg-white border border-[#e0dbd3] p-4 rounded-xl">

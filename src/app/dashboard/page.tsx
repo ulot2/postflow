@@ -16,7 +16,7 @@ export default function AnalyticsPage() {
 
   if (posts === undefined) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex flex-col md:flex-row h-screen overflow-hidden">
         <Sidebar />
         <main className="flex-1 flex items-center justify-center bg-[#f7f4ef]">
           <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
@@ -26,7 +26,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
         {/* Header */}

@@ -81,7 +81,7 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
         <header className="flex justify-between items-center mb-6 bg-white border border-[#e0dbd3] p-4 shrink-0 rounded-xl">

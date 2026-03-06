@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Settings,
   Lightbulb,
+  Menu,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SignedIn } from "@clerk/nextjs";
@@ -18,9 +19,13 @@ import { useWorkspace } from "../providers/WorkspaceContext";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "../ui/sheet";
+import { Button } from "../ui/button";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
   const { activeWorkspace, activeRole } = useWorkspace();
   const { accounts } = useWorkspaceAccounts(activeWorkspace?._id);
   const ideas = useQuery(
@@ -68,10 +73,10 @@ export function Sidebar() {
       : []),
   ];
 
-  return (
-    <aside className="w-64 h-screen sticky top-0 bg-[#0f0f0f] flex flex-col pt-6 pb-4 shrink-0">
+  const sidebarContent = (
+    <>
       {/* App Branding */}
-      <div className="px-5 mb-5">
+      <div className="px-5 mb-5 md:block hidden">
         <div className="flex items-center gap-[10px]">
           <div className="w-[30px] h-[30px] bg-[#d4f24a] rounded-[8px] flex items-center justify-center shrink-0">
             <svg
@@ -110,6 +115,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => setIsOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-colors text-[14px] ${
                 item.isActive
                   ? "bg-white/10 text-white"
@@ -133,6 +139,7 @@ export function Sidebar() {
         <div className="px-5 mb-4">
           <Link
             href="/settings?tab=accounts"
+            onClick={() => setIsOpen(false)}
             className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
           >
             <div className="flex flex-col">
@@ -184,6 +191,60 @@ export function Sidebar() {
           </div>
         </SignedIn>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between bg-[#0f0f0f] p-4 shrink-0 shadow-sm z-50">
+        <div className="flex items-center gap-[10px]">
+          <div className="w-[28px] h-[28px] bg-[#d4f24a] rounded-[8px] flex items-center justify-center shrink-0">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#0f0f0f"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <span className="text-white text-[16px] font-extrabold tracking-[-0.02em] font-syne">
+            PostFlow
+          </span>
+        </div>
+
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="w-[280px] p-0 bg-[#0f0f0f] border-r-white/10 flex flex-col pt-12 pb-4"
+          >
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            {sidebarContent}
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 h-screen sticky top-0 bg-[#0f0f0f] flex-col pt-6 pb-4 shrink-0 border-r border-white/5">
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

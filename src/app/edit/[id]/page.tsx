@@ -31,7 +31,7 @@ export default function EditPostPage() {
 
   if (post === undefined) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex flex-col md:flex-row h-screen overflow-hidden">
         <Sidebar />
         <main className="flex-1 flex items-center justify-center bg-[#f7f4ef]">
           <div className="w-8 h-8 border-4 border-[#0f0f0f] border-t-transparent rounded-full animate-spin" />
@@ -42,7 +42,7 @@ export default function EditPostPage() {
 
   if (post === null) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex flex-col md:flex-row h-screen overflow-hidden">
         <Sidebar />
         <main className="flex-1 flex items-center justify-center text-[#6b6b6b] bg-[#f7f4ef]">
           Post not found
@@ -118,7 +118,7 @@ function EditPostContent({
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f7f4ef] flex flex-col">
         <header className="flex justify-between items-center mb-6 bg-white border border-[#e0dbd3] p-4 shrink-0 rounded-xl">

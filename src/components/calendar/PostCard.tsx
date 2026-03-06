@@ -93,13 +93,13 @@ export function PostCard({
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm transition-all hover:z-50 hover:-translate-y-px hover:border-slate-300 hover:shadow-md",
+        "group relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white/90 p-3 text-xs shadow-sm transition-all md:hover:z-50 md:hover:-translate-y-px md:hover:border-slate-300 md:hover:shadow-md touch-none",
         transform ? "z-50 opacity-90 cursor-grabbing" : "cursor-grab",
       )}
     >
-      {/* Absolute Hover Actions */}
+      {/* Absolute Hover Actions (Desktop) */}
       <div
-        className="absolute right-2 bottom-2 z-10 flex opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto has-data-[state=open]:opacity-100 has-data-[state=open]:pointer-events-auto items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm"
+        className="hidden absolute right-2 bottom-2 z-10 md:flex opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto has-data-[state=open]:opacity-100 has-data-[state=open]:pointer-events-auto items-center gap-1 rounded-md border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur-sm"
         onPointerDown={(e) => e.stopPropagation()} // Stop drag when interacting with buttons
       >
         {status === "scheduled" && platform !== "linkedin" && (
@@ -196,6 +196,47 @@ export function PostCard({
       <p className="line-clamp-3 text-[0.78rem] leading-snug text-slate-700">
         {contentPreview}
       </p>
+
+      {/* Mobile Action Bar (Always visible on mobile) */}
+      <div
+        className="mt-1 pt-2 border-t border-slate-100 md:hidden flex justify-end items-center gap-2"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        {status === "scheduled" && platform !== "linkedin" && (
+          <button
+            onClick={onPublish}
+            className="flex items-center justify-center p-2.5 rounded-md text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-emerald-600 transition-colors"
+            title="Mark as Published"
+          >
+            <Check className="h-4 w-4" />
+          </button>
+        )}
+        <button
+          onClick={onEdit}
+          className="flex items-center justify-center p-2.5 rounded-md text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-blue-600 transition-colors"
+          title="Edit Post"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+
+        <ConfirmDeletePopover
+          onConfirm={() => {
+            if (onDelete) {
+              onDelete({
+                stopPropagation: () => {},
+              } as unknown as React.MouseEvent);
+            }
+          }}
+        >
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center p-2.5 rounded-md text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-red-600 transition-colors"
+            title="Delete Post"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </ConfirmDeletePopover>
+      </div>
     </div>
   );
 }
