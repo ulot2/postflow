@@ -45,11 +45,11 @@ const PLATFORMS: PlatformConfig[] = [
       </svg>
     ),
     color: "bg-[#E60023]",
-    comingSoon: false,
+    comingSoon: true,
   },
   {
     id: "twitter",
-    name: "Twitter / X",
+    name: "X",
     icon: (
       <svg
         className="w-5 h-5 text-white"
@@ -154,7 +154,7 @@ export function ConnectedAccounts() {
                   </div>
 
                   {platform.comingSoon && !isConnected && (
-                    <span className="px-2.5 py-1 bg-[#e0dbd3]/50 text-[#6b6b6b] text-[11px] font-bold tracking-wider uppercase rounded-full">
+                    <span className="px-2.5 py-1 bg-[#e0dbd3]/50 text-[#6b6b6b] text-[10px] font-bold tracking-wider uppercase rounded-full">
                       Coming Soon
                     </span>
                   )}
@@ -204,7 +204,7 @@ export function ConnectedAccounts() {
                       className={
                         platform.comingSoon
                           ? "bg-[#e0dbd3] text-[#6b6b6b]"
-                          : "bg-[#0f0f0f] text-[#d4f24a] hover:bg-black"
+                          : "bg-[#0f0f0f] text-[#d4f24a] hover:bg-white hover:text-[#0f0f0f] hover:border-[#d4f24a] hover:border hover:shadow-sm transition-all duration-300 cursor-pointer"
                       }
                     >
                       Connect

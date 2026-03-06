@@ -69,7 +69,7 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 h-screen bg-[#0f0f0f] flex flex-col pt-6 pb-4 shrink-0">
+    <aside className="w-64 h-screen sticky top-0 bg-[#0f0f0f] flex flex-col pt-6 pb-4 shrink-0">
       {/* App Branding */}
       <div className="px-5 mb-5">
         <div className="flex items-center gap-[10px]">

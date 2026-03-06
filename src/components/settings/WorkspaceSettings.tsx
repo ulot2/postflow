@@ -105,48 +105,83 @@ export function WorkspaceSettings() {
         <label className="block text-[13px] font-semibold text-[#0f0f0f] mb-3 font-syne uppercase tracking-wider">
           Brand Logo
         </label>
-        <div className="flex items-center gap-5">
-          <div className="relative group">
-            {logoPreview ? (
-              <div className="w-[72px] h-[72px] rounded-2xl overflow-hidden border-2 border-[#e0dbd3] bg-white">
+        <div className="flex items-start gap-6 p-6 rounded-2xl border border-[#e0dbd3] bg-[#faf9f7]/50 transition-all duration-300 hover:bg-[#faf9f7]">
+          {/* Avatar Area */}
+          <div
+            className="relative group cursor-pointer shrink-0"
+            onClick={() => fileRef.current?.click()}
+          >
+            <div className="w-[88px] h-[88px] rounded-2xl overflow-hidden border border-[#e0dbd3] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300 group-hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:border-[#0f0f0f]">
+              {logoPreview ? (
                 <Image
                   src={logoPreview}
                   alt="Logo"
-                  width={72}
-                  height={72}
-                  className="w-full h-full object-cover"
+                  width={88}
+                  height={88}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-              </div>
-            ) : (
-              <div className="w-[72px] h-[72px] rounded-2xl border-2 border-dashed border-[#e0dbd3] bg-white flex items-center justify-center">
-                <Camera className="w-6 h-6 text-[#6b6b6b]" />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-[#a3a3a3] group-hover:text-[#0f0f0f] transition-colors duration-300">
+                  <Camera className="w-6 h-6" />
+                  <span className="text-[10px] font-bold tracking-wider">
+                    UPLOAD
+                  </span>
+                </div>
+              )}
+
+              {/* Hover Overlay for existing logo */}
+              {logoPreview && (
+                <div className="absolute inset-0 bg-[#0f0f0f]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Uploading Spinner Overlay */}
             {uploading && (
-              <div className="absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center">
-                <Loader2 className="w-5 h-5 animate-spin text-[#0f0f0f]" />
+              <div className="absolute inset-0 bg-white/90 rounded-2xl flex items-center justify-center shadow-sm backdrop-blur-md z-10">
+                <Loader2 className="w-6 h-6 animate-spin text-[#0f0f0f]" />
+              </div>
+            )}
+
+            {/* Floating Camera Badge */}
+            {logoPreview && !uploading && (
+              <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-[#0f0f0f] text-[#d4f24a] flex items-center justify-center shadow-md transform transition-transform duration-300 group-hover:scale-110 border-2 border-white">
+                <Camera className="w-3.5 h-3.5" />
               </div>
             )}
           </div>
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="text-[13px] font-semibold text-[#0f0f0f] hover:text-[#d4f24a] transition-colors cursor-pointer"
-            >
-              {logoPreview ? "Change logo" : "Upload logo"}
-            </button>
-            {logoPreview && (
-              <button
-                onClick={handleRemoveLogo}
-                className="text-[13px] text-red-500 hover:text-red-600 transition-colors cursor-pointer"
-              >
-                Remove
-              </button>
-            )}
-            <span className="text-[11px] text-[#6b6b6b]">
-              PNG, JPG up to 2MB
+
+          {/* Action Buttons & Text */}
+          <div className="flex flex-col gap-3 pt-1">
+            <span className="text-[13px] text-[#6b6b6b] leading-relaxed max-w-[240px]">
+              Personalize your workspace with a brand logo. <br />
+              <span className="text-[#a3a3a3]">
+                Recommended: 512x512px (PNG, JPG)
+              </span>
             </span>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="text-[13px] font-semibold px-4 py-2 rounded-xl bg-white border border-[#e0dbd3] hover:border-[#0f0f0f] text-[#0f0f0f] transition-all shadow-sm hover:shadow-md cursor-pointer active:scale-95"
+              >
+                {logoPreview ? "Change Logo" : "Choose File"}
+              </button>
+
+              {logoPreview && (
+                <button
+                  type="button"
+                  onClick={handleRemoveLogo}
+                  className="text-[13px] font-medium px-4 py-2 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-700 transition-all cursor-pointer active:scale-95"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
           </div>
+
           <input
             ref={fileRef}
             type="file"
@@ -157,76 +192,93 @@ export function WorkspaceSettings() {
         </div>
       </div>
 
-      {/* Name */}
-      <div>
-        <label
-          htmlFor="ws-name"
-          className="block text-[13px] font-semibold text-[#0f0f0f] mb-2 font-syne uppercase tracking-wider"
-        >
-          Brand Name
-        </label>
-        <input
-          id="ws-name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-[#e0dbd3] bg-white text-[#0f0f0f] text-[14px] focus:outline-none focus:border-[#0f0f0f] transition-colors placeholder:text-[#6b6b6b]"
-          placeholder="Your brand name"
-        />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label
-          htmlFor="ws-desc"
-          className="block text-[13px] font-semibold text-[#0f0f0f] mb-2 font-syne uppercase tracking-wider"
-        >
-          Description
-        </label>
-        <textarea
-          id="ws-desc"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-[#e0dbd3] bg-white text-[#0f0f0f] text-[14px] focus:outline-none focus:border-[#0f0f0f] transition-colors resize-none placeholder:text-[#6b6b6b]"
-          placeholder="Short description of your brand"
-        />
-      </div>
-
-      {/* Workspace Type Badge */}
-      <div className="flex justify-between">
+      {/* Form Fields Container */}
+      <div className="space-y-6 bg-white p-6 rounded-2xl border border-[#e0dbd3] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        {/* Name */}
         <div>
-          <label className="block text-[13px] font-semibold text-[#0f0f0f] mb-2 font-syne uppercase tracking-wider">
-            Type
+          <label
+            htmlFor="ws-name"
+            className="block text-[13px] font-semibold text-[#0f0f0f] mb-2 font-syne uppercase tracking-wider"
+          >
+            Brand Name
           </label>
-          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-medium bg-[#0f0f0f] text-[#d4f24a] capitalize">
-            {activeWorkspace.type}
-          </span>
+          <div className="relative">
+            <input
+              id="ws-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-[#e0dbd3] bg-[#faf9f7] text-[#0f0f0f] text-[15px] font-medium focus:outline-none focus:border-[#0f0f0f] focus:ring-4 focus:ring-[#0f0f0f]/5 focus:bg-white transition-all placeholder:text-[#a3a3a3]"
+              placeholder="E.g., Acme Corp"
+            />
+          </div>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label
+            htmlFor="ws-desc"
+            className="block text-[13px] font-semibold text-[#0f0f0f] mb-2 font-syne uppercase tracking-wider"
+          >
+            Description
+          </label>
+          <div className="relative">
+            <textarea
+              id="ws-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-3 rounded-xl border border-[#e0dbd3] bg-[#faf9f7] text-[#0f0f0f] text-[15px] focus:outline-none focus:border-[#0f0f0f] focus:ring-4 focus:ring-[#0f0f0f]/5 focus:bg-white transition-all resize-none placeholder:text-[#a3a3a3]"
+              placeholder="Tell us a bit about what your brand does"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Actions */}
+      <div className="flex items-center justify-between pt-2">
+        {/* Workspace Type Badge */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold text-[#6b6b6b] mb-0 font-syne uppercase tracking-wider">
+            Plan Type
+          </label>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-[#e0dbd3] bg-[#faf9f7]">
+            <div className="w-2 h-2 rounded-full bg-[#d4f24a] shadow-[0_0_8px_rgba(212,242,74,0.6)] animate-pulse" />
+            <span className="text-[13px] font-bold text-[#0f0f0f] capitalize tracking-wide">
+              {activeWorkspace.type}
+            </span>
+          </div>
         </div>
 
         {/* Save */}
-        <div className="pt-2">
+        <div>
           <button
+            type="button"
             onClick={handleSave}
             disabled={saving || !hasChanges || !name.trim()}
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-semibold transition-all cursor-pointer ${
+            className={`relative overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-[14px] font-bold transition-all duration-300 cursor-pointer ${
               saved
-                ? "bg-green-500 text-white"
+                ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
                 : hasChanges && name.trim()
-                  ? "bg-[#0f0f0f] text-[#d4f24a] hover:opacity-90"
-                  : "bg-[#e0dbd3] text-[#6b6b6b] cursor-not-allowed"
+                  ? "bg-[#0f0f0f] text-[#d4f24a] hover:bg-[#1a1a1a] shadow-lg shadow-[#0f0f0f]/10 active:scale-95 group"
+                  : "bg-[#faf9f7] text-[#a3a3a3] border border-[#e0dbd3] cursor-not-allowed"
             }`}
           >
             {saving ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Saving…
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving…</span>
               </>
             ) : saved ? (
               <>
-                <Check className="w-4 h-4" /> Saved
+                <Check className="w-4 h-4" />
+                <span>Saved</span>
               </>
             ) : (
-              "Save Changes"
+              <>
+                <span>Save Changes</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
+              </>
             )}
           </button>
         </div>

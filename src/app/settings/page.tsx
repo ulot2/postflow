@@ -67,7 +67,7 @@ export default function SettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[14px] font-semibold transition-all cursor-pointer ${
+                  className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[13px] font-semibold transition-all cursor-pointer ${
                     isActive
                       ? "bg-[#0f0f0f] text-[#d4f24a] shadow-sm"
                       : "text-[#6b6b6b] hover:text-[#0f0f0f]"
