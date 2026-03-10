@@ -50,7 +50,7 @@ function DroppableDayZone({
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-h-0 overflow-y-auto transition-colors ${
+      className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar transition-colors ${
         isOver ? "bg-blue-50/60" : ""
       }`}
     >
@@ -107,15 +107,12 @@ export function Calendar() {
     [monthStart],
   );
 
-  // Build an array of all visible days (up to 6 weeks × 7 = 42 cells).
   const calendarDays = useMemo(() => {
     const days: Date[] = [];
     let cursor = gridStart;
-    // Always fill complete weeks until we've passed the end of the month.
     while (days.length < 42) {
       days.push(cursor);
       cursor = addDays(cursor, 1);
-      // Stop at the end of a full week if we've already covered the month.
       if (days.length % 7 === 0 && cursor > monthEnd) break;
     }
     return days;
@@ -149,14 +146,12 @@ export function Calendar() {
     return map;
   }, [postsInRange]);
 
-  /* ── Navigation handlers ── */
   const handlePrevMonth = () => setCurrentDate((prev) => addMonths(prev, -1));
 
   const handleNextMonth = () => setCurrentDate((prev) => addMonths(prev, 1));
 
   const handleToday = () => setCurrentDate(new Date());
 
-  /* ── Render ── */
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex h-full flex-col">
@@ -194,7 +189,7 @@ export function Calendar() {
         </div>
 
         {/* ── Mobile Agenda View ── */}
-        <div className="md:hidden flex-1 overflow-y-auto space-y-4 pb-12">
+        <div className="md:hidden flex-1 overflow-y-auto custom-scrollbar space-y-4 pb-12">
           {calendarDays.map((day) => {
             const dayKey = startOfDay(day).getTime();
             const dayPosts = postsByDayKey.get(dayKey) ?? [];
@@ -205,7 +200,6 @@ export function Calendar() {
             // Further, we might only want to show days that have posts, or today.
             if (!inMonth) return null;
 
-            // Optional: Hide empty days to make the agenda cleaner.
             // If you want ALL days of the month to appear, remove this if statement.
             if (dayPosts.length === 0 && !today) return null;
 
@@ -286,7 +280,7 @@ export function Calendar() {
 
         {/* ── Desktop Calendar grid ── */}
         <div className="hidden md:flex min-h-0 flex-1 flex-col rounded-xl border border-[#e0dbd3] bg-white overflow-hidden">
-          <div className="flex-1 overflow-y-hidden">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             <div className="flex flex-col h-full">
               {/* Day-of-week header */}
               <div className="calendar-grid-7 border-b border-[#e0dbd3] bg-[#faf8f4] shrink-0">
